@@ -1,0 +1,12 @@
+#!/bin/bash
+# Sets the python path to run codes in this repo
+# Handle the sub-modules
+for d in common_python
+  do
+    cd $d
+    source setup_env.sh
+    cd ..
+  done
+#
+PYTHONPATH=${PYTHONPATH}:`pwd`
+export PYTHONPATH
