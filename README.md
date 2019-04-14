@@ -1,4 +1,4 @@
-# xGUESS: eXpression of Gene Under- and ovEr-tranScription States
+# xguess: eXpression of Gene Under- and ovEr-tranScription States
 Analysis of expression data for state identification, state characterization, and state assignment.
 
 ## Usage Notes
