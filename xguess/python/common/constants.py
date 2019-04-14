@@ -33,7 +33,7 @@ for _ in range(4):
   PROJECT_DIR = os.path.dirname(PROJECT_DIR)
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
 CODE_DIR = PROJECT_DIR
-for directory in ["minion", "python"]:
+for directory in ["xguess", "python"]:
   CODE_DIR = os.path.join(CODE_DIR, directory)
 TEST_DIR = os.path.join(CODE_DIR, "tests")
 DATA_PROVIDER_PERSISTER_PATH = os.path.join(
