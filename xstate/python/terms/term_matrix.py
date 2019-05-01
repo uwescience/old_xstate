@@ -3,6 +3,7 @@
 from common import constants as cn
 from common.data_provider import DataProvider
 from common.data_grouper import DataGrouper
+from common_python.statistics import util_statistics
 from plots import util_plots
 from common_python.text import util_text
 
@@ -133,18 +134,9 @@ class TermMatrix(object):
     df = self.makeTimeAggregationMatrix(
         is_up_regulated=is_up_regulated)
     # Remove rows with zero variance
-    df_T = df.transpose()
-    ser_std = df_T.std(axis=1)
-    indices = [i for i in ser_std.index 
-        if np.isclose(ser_std[i], 0.0)]
-    df_T = df_T.drop(indices)
+    df_filtered = util_statistics.filterZeroVarianceRows(df.T)
     # Compute significance levels
-    ser_std = df_T.std(axis=1)
-    ser_mean = df_T.mean(axis=1)
-    df_TT = df_T.subtract(ser_mean, axis=0)
-    df_TT = df_TT.divide(ser_std, axis=0)
-    df_log = df_TT.applymap(lambda v:
-        -np.log10(1 - stats.norm(0, 1).cdf(v)))
+    df_log = util_statistics.calcLogSL(df_filtered)
     # Construct a cluster map
     cg = sns.clustermap(df_log, col_cluster=False, 
         cbar_kws={"ticks":[0,5]}, cmap="Blues")
