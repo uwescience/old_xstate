@@ -12,6 +12,8 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 import seaborn as sns
+from scipy.spatial import distance
+from scipy.cluster.hierarchy import linkage, fcluster
 
 
 class TermMatrix(object):
@@ -123,6 +125,32 @@ class TermMatrix(object):
         column_values[col].append(row[idx])
     return pd.DataFrame(column_values)
 
+  def calcClusters(self, max_distance=1, is_up_regulated=True):
+    """
+    Calculates log significance levels and clusters.
+    :param float max_distance: maximum distance between clusters,
+        otherwise merged
+    :return pd.DataFrame, ndarray, pd.Series:
+       df_log - log of significance level
+       row_linkage - linkage matrix
+           See https://stackoverflow.com/questions/9838861/scipy-linkage-format
+       ser_cluster - cn.GROUP (indexed by term)
+    """
+    df = self.makeTimeAggregationMatrix(
+        is_up_regulated=is_up_regulated)
+    # Remove rows with zero variance
+    df_filtered = util_statistics.filterZeroVarianceRows(df.T)
+    # Compute significance levels
+    df_log = util_statistics.calcLogSL(df_filtered, round_decimal=3)
+    # Compute the clusters
+    log_arrays = np.asarray(df_log)
+    row_linkage = linkage(
+        distance.pdist(log_arrays), method='average')
+    ser_cluster = pd.Series(fcluster(row_linkage, 0.1, criterion="distance"))
+    ser_cluster.index = df_log.index
+    #
+    return df_log, row_linkage, ser_cluster
+
   # Include state transitions
   # Note how clusters relate to state observations
   def plotTimeAggregation(self, is_up_regulated=True):
@@ -131,15 +159,14 @@ class TermMatrix(object):
     :param bool is_include_ylabels:
     :param bool is_up_regulated:
     """
-    df = self.makeTimeAggregationMatrix(
-        is_up_regulated=is_up_regulated)
-    # Remove rows with zero variance
-    df_filtered = util_statistics.filterZeroVarianceRows(df.T)
-    # Compute significance levels
-    df_log = util_statistics.calcLogSL(df_filtered)
+    df_log, row_linkage, ser_cluster =  \
+        self.calcClusters(is_up_regulated=is_up_regulated)
+    # Heatmap
+    cg = sns.clustermap(df_log, row_linkage=row_linkage, 
+        col_cluster=False, cbar_kws={"ticks":[0,5]}, cmap="Blues")
     # Construct a cluster map
-    cg = sns.clustermap(df_log, col_cluster=False, 
-        cbar_kws={"ticks":[0,5]}, cmap="Blues")
+    #cg = sns.clustermap(df_log, col_cluster=False, 
+    #    cbar_kws={"ticks":[0,5]}, cmap="Blues")
     # Set the labels
     cg.ax_heatmap.set_xlabel("Time")
     if is_up_regulated:
@@ -148,6 +175,10 @@ class TermMatrix(object):
       direction = "Down"
     title = "-log10 zscores of %s-regulated term counts" % (direction)
     cg.ax_heatmap.set_title(title)
+    xticks = cg.ax_heatmap.get_xticks() - 0.5  # Correct tick position
+    cg.ax_heatmap.set_xticks(xticks)
+    cg.ax_heatmap.set_yticks([])
+    cg.ax_heatmap.set_yticklabels([])
     # Add the state transitions
     util_plots.plotStateTransitions(ymax=len(df_log),
         ax=cg.ax_heatmap, is_plot=False)

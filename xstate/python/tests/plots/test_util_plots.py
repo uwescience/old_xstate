@@ -31,5 +31,12 @@ class TestFunctions(unittest.TestCase):
     # Smoke test only
     util_plots.plotClusteredHeatmap(is_plot=IS_PLOT)
 
+  def testPlotClustermap(self):
+    # Smoke test only
+    if IGNORE_TEST:
+      return
+    util_plots.plotClustermap(is_plot=IS_PLOT)
+    util_plots.plotClustermap(is_plot=IS_PLOT, is_up_regulated=False)
+
 if __name__ == '__main__':
   unittest.main()

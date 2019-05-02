@@ -32,9 +32,9 @@ class TestTermMatrix(unittest.TestCase):
     self.assertEqual(len(df), cn.NUM_TIMES)
 
   def testPlotAggregation(self):
+    # Only smoke tests
     if IGNORE_TEST:
       return
-    # Only smoke tests
     self.matrix.plotTimeAggregation(is_up_regulated=False)
     self.matrix.plotTimeAggregation(is_up_regulated=True)
 

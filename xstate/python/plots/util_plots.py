@@ -5,10 +5,12 @@ from common import transform_data
 from common import constants as cn
 from common_python.dataframe import util_dataframe
 from common_python.plots import util_plots as cup
+from common_python.statistics import util_statistics
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import seaborn as sns
 from sklearn.cluster import KMeans
 
 
@@ -112,3 +114,41 @@ def plotClusteredHeatmap(provider=None, ncluster=5, **kwargs):
       lambda v: np.nan if np.isclose(v, 0) else v)
   plotThresholdHeatmap(provider=provider, df=df,
       title="Clustered Differential Expression", **kwargs)
+
+def plotClustermap(provider=None, is_up_regulated=True, 
+    is_plot=True):
+  """
+  Plots a heatmap where categorical axes are grouped with similar values.
+  :param DataProvider provider: 
+  :param bool is_up_regulated: Test for up regulated genes
+  :param bool is_plot: plot the result
+  """
+  provider = getProvider(provider)
+  df = provider.df_normalized
+  if not is_up_regulated:
+    df = df.applymap(lambda v: -v)
+  df_filtered = util_statistics.filterZeroVarianceRows(df)
+  df_log = util_statistics.calcLogSL(df_filtered)
+  # Construct a cluster map
+  cg = sns.clustermap(df_log, col_cluster=False, 
+      cbar_kws={"ticks":[0,5]}, cmap="Blues")
+  # Set the labels
+  cg.ax_heatmap.set_xlabel("Time")
+  # Adjust for clustermap
+  xticks = cg.ax_heatmap.get_xticks() - 0.5
+  cg.ax_heatmap.set_xticks(xticks)
+  if is_up_regulated:
+    direction = "Up"
+  else:
+    direction = "Down"
+  title = "-log10 zscores of %s-Regulated gene counts" % (direction)
+  cg.ax_heatmap.set_title(title)
+  # Don't show the genes
+  cg.ax_heatmap.set_yticklabels([])
+  cg.ax_heatmap.set_yticks([])
+  # Add the state transitions
+  plotStateTransitions(ymax=len(df_log),
+      ax=cg.ax_heatmap, is_plot=False)
+  #
+  if is_plot:
+    plt.show()

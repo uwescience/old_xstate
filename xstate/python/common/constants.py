@@ -1,6 +1,7 @@
 import os
 
 # Data Frame Columns
+COUNT = "count"
 CNT_DOWN = "cnt_down"  # Count of -1s present
 CNT_GROUP = "cnt_group"  # Count of members in the same group
 CNT_UP = "cnt_up"  # Count of +1s present
@@ -9,6 +10,7 @@ END = "End"  # Start position of gene
 GENE_ID = "GENE_ID"  # Unique string for gene
 GENE_IDS = "GENE_IDs"  # List of GENE_ID
 GENE_NAME = "GENE_NAME"
+GROUP = "group"
 GO_LINK = "GO_Link"
 GO_ONTOLOGY = "GO_Ontology"
 GO_TERM = "GO_Term"
@@ -18,6 +20,7 @@ LENGTH = "Length"  # Length of gene in base pairs
 MEAN = "mean"  # average value
 PRODUCT = "PRODUCT"  # Transcript product
 SAMPLE = "sample"  # Identity of a sample
+TERM = "term"  # GO term
 STAGE_NAME = "name"  # Name of the stage
 STAGE_COLOR = "color"  # Color for the stage
 START = "Start"  # Starting position of gene
