@@ -8,7 +8,7 @@ At present, we only have one example of ground truth for state assignments, with
 
 ## Technical Description of Tasks
 
-A **state vector** is a vector of gene expression values. An **extended state vector** includes information beyond gene expression values such as: include: genes for which no value is given, whether the gene is up- or down-regulated, and variance of values.
+A **state vector** is a vector of gene expression values. A **generalized state vector (GSV)** includes information beyond gene expression values such as: include: genes for which no value is given, whether the gene is up- or down-regulated, and variance of values. One representation of a GSV is a vector of means and a vector of variances. A variance of ``inf`` means that a gene is ignored.
 
 The **state characterization task** specifies one or more extended state vectors for each state. The characterization of a state should adequately distinguish that state from other states.
 
