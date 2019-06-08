@@ -38,6 +38,14 @@ class TestTermMatrix(unittest.TestCase):
     self.matrix.plotTimeAggregation(is_up_regulated=False)
     self.matrix.plotTimeAggregation(is_up_regulated=True)
 
+  def testMakeGeneTerm(self):
+    if IGNORE_TEST:
+      return
+    self.assertTrue(helpers.isValidDataFrame(self.matrix.df_gene_term,
+        [cn.GROUP, cn.TERM, cn.GENE_ID, cn.CNT_TERM,
+        cn.CNT_GENE, cn.CNT_REGULATED]))
+    
+
 
 if __name__ == '__main__':
   unittest.main()

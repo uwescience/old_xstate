@@ -4,6 +4,9 @@ import os
 COUNT = "count"
 CNT_DOWN = "cnt_down"  # Count of -1s present
 CNT_GROUP = "cnt_group"  # Count of members in the same group
+CNT_GENE = "cnt_gene"  # Number of genes
+CNT_REGULATED = "cnt_regulated"  # Count of times up- down-regulated
+CNT_TERM = "cnt_term"  # Number of GO terms"
 CNT_UP = "cnt_up"  # Count of +1s present
 CV = "cv"  # coefficient of variation
 END = "End"  # Start position of gene
@@ -16,6 +19,7 @@ GO_ONTOLOGY = "GO_Ontology"
 GO_TERM = "GO_Term"
 GROUP = "group"
 HOURS = "hours"
+INDEX = "index"
 LENGTH = "Length"  # Length of gene in base pairs
 MEAN = "mean"  # average value
 PRODUCT = "PRODUCT"  # Transcript product

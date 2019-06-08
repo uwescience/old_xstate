@@ -36,18 +36,72 @@ class TermMatrix(object):
     self.grouper = DataGrouper(**kwargs)
     self.grouper.do(min_size=1)
     self.df_matrix = self._makeMatrix(term_column)
+    self.df_gene_term = self._makeGeneTerm()
+
+  def _makeTermGroup(self, term_column=cn.GO_TERM):
+    """
+    :param str term_column: column in go_terms to use for text
+    :return pd.DataFrame:
+      index - group (time intervals with trinary values)
+      column - Term
+    """
+    df = self.grouper.df_gene_group.merge(
+        self.provider.df_go_terms, left_index=True, 
+        right_index=True, how='inner')
+    if term_column == cn.INDEX:
+      df_term = df[[cn.GROUP]].copy()
+      df_term[term_column] = df.index
+    else:
+      df_term = df[[cn.GROUP, term_column]].copy()
+    df_term = df_term.set_index(cn.GROUP)
+    return df_term
 
   def _makeMatrix(self, term_column=cn.GO_TERM):
     """
     :param str term_column: column in go_terms to use for text
     :return pd.DataFrame: matrix with the terms
     """
-    df = self.grouper.df_gene_group.merge(
-        self.provider.df_go_terms, left_index=True, 
-        right_index=True, how='inner')
-    df_term = df[[cn.GROUP, term_column]].copy()
-    df_term = df_term.set_index(cn.GROUP)
+    df_term = self._makeTermGroup(term_column=term_column)
     df_result = util_text.makeTermMatrix(df_term[term_column])
+    return df_result
+
+  def _makeGeneTerm(self):
+    """
+    Finds the genes and terms that co-occur at the same times.
+    :return pd.DataFrame:
+        cn.GROUP - trinary values for genes at times
+        cn.TERM - list of GO terms
+        cn.GENE_D - list of genes
+        cn.CNT_TERM - count of GO terms
+        cn.CNT_GENE - count of genes
+        cn.CNT_REGULATED - count of times up- down-regulated
+    """
+    def makeGroupedDF(df):
+      df = df.reset_index()
+      return df.groupby(cn.GROUP)
+    def extract(df, key, col):
+      return df.loc[[key], col].values.tolist()
+    #
+    df_term = self._makeTermGroup()
+    df_gene = self.grouper.df_gene_group
+    df_gene = df_gene.reset_index()
+    df_gene = df_gene.set_index(cn.GROUP)
+    dfg_term = makeGroupedDF(df_term)
+    dfg_gene = makeGroupedDF(self.grouper.df_gene_group)
+    # Find the keys in common
+    keys_term = [k for k in dfg_term.groups]
+    keys_gene = [k for k in dfg_gene.groups]
+    keys_common = set(keys_term).intersection(keys_gene)
+    dict_df = {cn.GROUP: [], cn.TERM: [], cn.GENE_ID: []}
+    for key in keys_common:
+      dict_df[cn.GROUP].append(key)
+      dict_df[cn.TERM].append(extract(df_term, key, cn.GO_TERM))
+      dict_df[cn.GENE_ID].append(extract(df_gene, key, cn.GENE_ID))
+    df_result = pd.DataFrame(dict_df)
+    df_result[cn.CNT_GENE] = [len(g) for g in df_result[cn.GENE_ID]]
+    df_result[cn.CNT_TERM] =  [len(t) for t in df_result[cn.TERM]]
+    df_result[cn.CNT_REGULATED] =   \
+        [len(g) for g in df_result[cn.GROUP]]
     return df_result
 
   def makeAggregationMatrix(self, predicates):
