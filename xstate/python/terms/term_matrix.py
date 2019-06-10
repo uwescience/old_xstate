@@ -101,7 +101,7 @@ class TermMatrix(object):
     df_result[cn.CNT_GENE] = [len(g) for g in df_result[cn.GENE_ID]]
     df_result[cn.CNT_TERM] =  [len(t) for t in df_result[cn.TERM]]
     df_result[cn.CNT_REGULATED] =   \
-        [len(g) for g in df_result[cn.GROUP]]
+        [sum([np.abs(x) for x in g]) for g in df_result[cn.GROUP]]
     return df_result
 
   def makeAggregationMatrix(self, predicates):
