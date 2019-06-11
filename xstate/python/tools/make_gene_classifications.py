@@ -16,10 +16,10 @@ from common_python.bioinformatics import kegg_extractor
 import os
 
 # Files
-FILE_KEGG_PATHWAYS = "kegg_pathways.csv"
-FILE_KEGG_GENE_PATHWAY = "kegg_gene_pathway.csv"
-FILE_KEGG_GENE_EC = "kegg_gene_ec.csv"
-FILE_KEGG_GENE_KO = "kegg_gene_ko.csv"
+FILE_KEGG_PATHWAYS = "mtb_kegg_pathways.csv"
+FILE_KEGG_GENE_PATHWAY = "mtb_kegg_gene_pathway.csv"
+FILE_KEGG_GENE_EC = "mtb_gene_ec.csv"
+FILE_KEGG_GENE_KO = "mtb_gene_ko.csv"
 FILES_KEGG = [
     FILE_KEGG_PATHWAYS,
     FILE_KEGG_GENE_PATHWAY,
@@ -33,13 +33,29 @@ MTV = "mtv"
 def makePath(filename, directory):
   return os.path.join(directory, filename)
 
-def writeFile(path, df_base, columns, directory):
+def writeFile(filename, df_base, columns, directory):
+  """
+  Writes the columns of the base DF to a file.
+  :param str filename: filename to write
+  :param pd.DataFrame df_base: DF from which to extract columns
+  :param list-str columns:
+  :param str directory: directory where file will be written
+  """
   df = df_base[columns]
   df = df.copy()
+  if cpn.KEGG_GENE in columns:
+    df[cn.GENE_ID] = df[cpn.KEGG_GENE]
+    df = df.drop(columns=cpn.KEGG_GENE)
   df = df.drop_duplicates()
-  df.to_csv(makePath(path, directory), index=False)
+  df.to_csv(makePath(filename, directory), index=False)
 
 def make(max_count=-1, directory=cn.DATA_DIR):
+  """
+  Makes the categorization files.
+  :param int max_count: maximum number of records to process.
+      <0 means to process all.
+  :param str directory: directory where files reside
+  """
   extractor = kegg_extractor.KeggExtractor(MTV)
   # Do pathways
   df_pathways = extractor.listPathway()
