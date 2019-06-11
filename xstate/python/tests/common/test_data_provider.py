@@ -156,14 +156,14 @@ class TestDataProvider(unittest.TestCase):
         self.provider.df_cv,
         self.provider.df_normalized,
         self.provider.df_gene_expression_state,
-        self.provider.df_ec_terms, 
-        self.provider.df_ko_terms, 
-        self.provider.df_kegg_gene_pathways, 
         ]
     dfs.extend(self.provider.dfs_data)
     [self.checkDF(df) for df in dfs]
     dfs = [
+        self.provider.df_kegg_gene_pathways, 
         self.provider.df_go_terms, 
+        self.provider.df_ec_terms, 
+        self.provider.df_ko_terms, 
         self.provider.df_kegg_pathways, 
         ]
     [self.checkDF(df, is_check_index=False) for df in dfs]
