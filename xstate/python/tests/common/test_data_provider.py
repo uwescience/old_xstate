@@ -36,13 +36,17 @@ class TestDataProvider(unittest.TestCase):
 
   def checkDF(self, df, is_check_index=True):
     """
-    Verifies that the index are genes.
+    Verifies DataFrames
+    :param pd.DataFrame df:
+    :param bool is_check_index: checks that index is GENE
     """
     # Non-zero length
     self.assertGreater(len(df), 0)
     # Has the right index
     if is_check_index:
       b = set(df.index).issubset( self.df_gene_description.index)
+      if not b:
+        import pdb; pdb.set_trace()
       self.assertTrue(b)
     # No nan values
     trues = [not np.nan in df[c] for c in df.columns]
@@ -152,10 +156,17 @@ class TestDataProvider(unittest.TestCase):
         self.provider.df_cv,
         self.provider.df_normalized,
         self.provider.df_gene_expression_state,
+        self.provider.df_ec_terms, 
+        self.provider.df_ko_terms, 
+        self.provider.df_kegg_gene_pathways, 
         ]
     dfs.extend(self.provider.dfs_data)
     [self.checkDF(df) for df in dfs]
-    self.checkDF(self.provider.df_go_terms, is_check_index=False)
+    dfs = [
+        self.provider.df_go_terms, 
+        self.provider.df_kegg_pathways, 
+        ]
+    [self.checkDF(df, is_check_index=False) for df in dfs]
     columns = self.provider.df_stage_matrix.columns
     diff = set(columns).symmetric_difference(
         [cn.STAGE_NAME, cn.STAGE_COLOR])

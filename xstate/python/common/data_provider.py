@@ -26,6 +26,10 @@ FILENAME_STAGES = "stages_matrix"
 FILENAME_GENEDATA = "gene_data"
 FILENAME_GENE_EXPRESSION_STATE = "gene_expression_state"
 FILENAME_GO_TERMS = "MTB.GO.All.GOterms"
+FILENAME_EC_TERMS = "mtb_gene_ec"
+FILENAME_KO_TERMS = "mtb_gene_ec"
+FILENAME_KEGG_PATHWAYS = "mtb_kegg_pathways"
+FILENAME_KEGG_GENE_PATHWAY = "mtb_kegg_gene_pathway"
 NUM_REPL = 3
 TIME_0 = "T0"
 MIN_LOG2_VALUE = -10
@@ -44,6 +48,10 @@ class DataProvider(object):
     "df_stage_matrix", 
     "df_gene_expression_state",   # Genes expressed in each state
     "df_go_terms", 
+    "df_ec_terms", 
+    "df_ko_terms", 
+    "df_kegg_pathways", 
+    "df_kegg_gene_pathways", 
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
@@ -264,6 +272,17 @@ class DataProvider(object):
       provider = persister.get()
       self._setValues(provider=provider)
     else:
+      # Gene categorizations
+      self.df_ec_terms =  \
+          self._makeDFFromCSV(FILENAME_EC_TERMS, is_index_geneid=True)
+      self.df_ko_terms =  \
+          self._makeDFFromCSV(FILENAME_KO_TERMS, is_index_geneid=True)
+      self.df_kegg_pathways =  \
+          self._makeDFFromCSV(FILENAME_KEGG_PATHWAYS,
+          is_index_geneid=False)
+      self.df_kegg_gene_pathways =  \
+          self._makeDFFromCSV(FILENAME_KEGG_GENE_PATHWAY,
+          is_index_geneid=True)
       # GO Terms
       self.df_go_terms = self._makeGoTerms()
       # Gene expression for state
