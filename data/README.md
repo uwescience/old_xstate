@@ -23,5 +23,5 @@ by Mario on 3/27/2019.
 Transformed data from Eliza into a CSV with terms
 
 ## Access KEGG pathways
-- list all pathways for MTB: 11http://rest.kegg.jp/list/pathway/mtb``
-- get details for a pathway: ``http://rest.kegg.jp/get/path:mtb00010``
+- list all pathways for MTB: ``http://rest.kegg.jp/list/pathway/mtv``
+- get details for a pathway: ``http://rest.kegg.jp/get/path:mtv00010``

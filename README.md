@@ -6,5 +6,3 @@
 
 ## Installation
 1. Use git clone --recursive <repository path>
-
-

@@ -41,7 +41,6 @@ class TestTermMatrix(unittest.TestCase):
   def testMakeGeneTerm(self):
     if IGNORE_TEST:
       return
-    import pdb; pdb.set_trace()
     self.assertTrue(helpers.isValidDataFrame(self.matrix.df_gene_term,
         [cn.GROUP, cn.TERM, cn.GENE_ID, cn.CNT_TERM,
         cn.CNT_GENE, cn.CNT_REGULATED]))
