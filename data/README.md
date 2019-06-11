@@ -25,3 +25,9 @@ Transformed data from Eliza into a CSV with terms
 ## Access KEGG pathways
 - list all pathways for MTB: ``http://rest.kegg.jp/list/pathway/mtv``
 - get details for a pathway: ``http://rest.kegg.jp/get/path:mtv00010``
+
+## Categorization of genes
+- mtb\_kegg\_pathway.csv - KEGG pathways and descriptions
+- mtb\_kegg\_gene\_pathways.csv - gene, KEGG pathway
+- mtb\_gene\_ec.csv - gene, EC number
+- mtb\_gene\_ko.csv - gene, KEGG orthology
