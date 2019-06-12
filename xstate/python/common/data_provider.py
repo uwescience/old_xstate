@@ -1,17 +1,32 @@
 """
 Makes Data Available in Standard Formats.
   gene_description DF
-    GENE_ID (index), GENE_NAME, LENGTH, PRODUCT, START, END, STRAND
+    cn.GENE_ID (index), cn.GENE_NAME, cn.LENGTH, cn.PRODUCT, cn.START, cn.END, cn.STRAND
   Dataframes in dfs_data
-    GENE_ID (index), time indices
+    cn.GENE_ID (index), time indices
   hypoxia curve DF
-    SAMPLE, HOURS, 0, 1, 2 (DO values), mean, std, cv
+    cn.SAMPLE, cn.HOURS, 0, 1, 2 (DO values), mean, std, cv
   dfs_normalized
-    GENE_ID (index), time indices
-    
+    cn.GENE_ID (index), time indices
+  df_mean,   # Mean values of counts
+  df_std,   # Std of count values
+  df_cv,   # Coefficient of variation
+  df_stage_matrix,
+  df_gene_expression_state,   # Genes expressed in each state
+  df_go_terms
+    cn.GENE_ID cn.GO_TERM
+  df_ec_terms
+    cn.GENE_ID cpn.KEGG_EC
+  df_ko_terms
+    cn.GENE_ID cpn.KEGG_KO
+  df_kegg_pathways
+    cpn.KEGG_PATHWAY cpn.DESCRIPTION
+  df_kegg_gene_pathways
+    cn.GENE_ID cpn.KEGG_PATHWAY
 """
 
 import common.constants as cn
+import common_python.constants as cpn
 from common_python.util.persister import Persister
 
 import os
@@ -45,13 +60,13 @@ class DataProvider(object):
     "df_std",   # Std of count values
     "df_cv",   # Coefficient of variation
     "df_normalized",   # Normalized data
-    "df_stage_matrix", 
+    "df_stage_matrix",
     "df_gene_expression_state",   # Genes expressed in each state
-    "df_go_terms", 
-    "df_ec_terms", 
-    "df_ko_terms", 
-    "df_kegg_pathways", 
-    "df_kegg_gene_pathways", 
+    "df_go_terms",
+    "df_ec_terms",
+    "df_ko_terms",
+    "df_kegg_pathways",
+    "df_kegg_gene_pathways",
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
@@ -142,8 +157,8 @@ class DataProvider(object):
       """
       num_repl = self._getNumRepl()
       df_mean = self._makeMeanDF()
-      df_std = (sum([self.dfs_data[n]*self.dfs_data[n] 
-          for n in range(num_repl)]) 
+      df_std = (sum([self.dfs_data[n]*self.dfs_data[n]
+          for n in range(num_repl)])
           - num_repl * df_mean * df_mean) / (num_repl - 1)
       return df_std.pow(1./2)
 
@@ -197,7 +212,7 @@ class DataProvider(object):
         for idx in df_repl_mean.index:
           df_repl.loc[idx, :] = df_repl.loc[idx, :] - df_repl_mean[idx]
         dfs.append(df_repl)
-    # 
+    #
     return dfs
 
   def _makeNormalizedDF(self):
