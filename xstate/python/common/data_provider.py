@@ -6,7 +6,7 @@ Makes Data Available in Standard Formats.
     cn.GENE_ID (index), time indices
   hypoxia curve DF
     cn.SAMPLE, cn.HOURS, 0, 1, 2 (DO values), mean, std, cv
-  dfs_normalized
+  df_normalized
     cn.GENE_ID (index), time indices
   df_mean,   # Mean values of counts
   df_std,   # Std of count values
@@ -220,6 +220,7 @@ class DataProvider(object):
     Standardized the values for each gene.
     Drops rows where all columns are minimum values.
     Assumes that self.df_gene_expression_state has been initialized.
+    Only includes genes that are expressed.
     """
     df = self._makeDFFromCSV(FILENAME_NORMALIZED)
     df = df.set_index(cn.GENE_ID)
