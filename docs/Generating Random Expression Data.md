@@ -5,5 +5,5 @@ We proceed as follows using vectorization to calculate $X^{\prime}$ the randomiz
 
 1. Create $Y$ with shape $m \times n$ where each column is drawn from the Bernoulli distribution with parameter $f$.
 1. Create a column permutation $P$ that randomly permutes the columns. Let $Z = PY$.
-1. $W = P^{-1} \times X*Z$, where $*$ is element wise multiplication and $\times$ is normal matrix multiplication.
+1. $W = P^{-1} \times X*Z$, where * is element wise multiplication and $\times$ is normal matrix multiplication.
 1. $X^{\prime} = X - Y*X + W$
