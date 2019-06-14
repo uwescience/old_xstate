@@ -1,6 +1,8 @@
 # Generating Random Expression Data
 Consider  $X = {x_{m,n} }$ where = $m \leq M$ and $n \leq N$. In our case, there are $M$ genes and $N$ times. We want to generate a new matrix is which $f$ of the values are changed in the following way. $x_{m,n}$ is unchanged with probability $1-f$. With probability $f$, $x_{m,n}$ is drawn uniformly from $\{x_{m,1}, \cdots, x_{m,N}\}$.
 
+## Algorithm
+
 We proceed as follows using vectorization to calculate $X^{\prime}$ the randomized version of $X$.
 
 1. Create $Y$ with shape $m \times n$ where each column is drawn from the Bernoulli distribution with parameter $f$.
@@ -22,3 +24,7 @@ We can calculate $q_s$ and $q_c$. $(1 - p)^K$ is the probability that a row is n
 2. $q_c$ is small if $p$ is close to 0.5 and/or $K$ is large.
 
 From this, we conclude that $p \in [0.5, 1]$. We want to choose $p, K$ to minimize $max(1-q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
+
+## Implementation Notes
+
+1. We can avoid matrix multiplication by using random permutations. It is useful to construct easily the inverse of a permutation. Let $\pi$ be a permutation and let $\pi^I$ be the identity permutation. Clearly, $\pi \circ \pi^{-1} = \pi^{-1} \circ \pi = \pi^I$. Let $x^I = (1, 2, \cdots, N)$. In general, a sequence $x$ of $N$ 1-based integers defines a permutation on $N$ in that $\pi_x (i) = x_i$. So, $\pi^{-1}_x (i) = x^I_{x_i}$. Note that $\pi^{-1}_x \circ \pi_x (i) = ?$
