@@ -49,3 +49,12 @@ Note that for $p = 0.25$ and $K=10$, $q_c > 0.99$. And for $K=20$, $q_c > 0.9999
 ## Implementation Notes
 
 1. Having a larger $K$ is unlikely to be costly since it's we're just changing pointers to columns, not moving data.
+
+1. It is likely more efficient to generate a greater number of random vectors by using many copies of $X$ concatenated side-by-side.
+
+1. The data returned will be a tuple of the randomized vector and its state. We need to balance the sizes of state by ensuring that each state has the same number of columns.
+
+1. The features should be gene groups, not genes.
+
+1. Want to have a total of about 1500 instances balanced across the sates ([reference says the number of instances should be about the same as the number of uncorrelated features](https://academic.oup.com/bioinformatics/article/21/8/1509/249540)).
+
