@@ -21,4 +21,4 @@ We can calculate $q_s$ and $q_c$. $(1 - p)^K$ is the probability that a row is n
 1. $q_s$ is large if $p$ is large and/or $K$ is large.
 2. $q_c$ is small if $p$ is close to 0.5 and/or $K$ is large.
 
-From this, we conclude that $p \in [0.5, 1]$. We want to choose $p, K$ to minimize $max(q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
+From this, we conclude that $p \in [0.5, 1]$. We want to choose $p, K$ to minimize $max(1-q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
