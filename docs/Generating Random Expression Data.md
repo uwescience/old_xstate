@@ -16,15 +16,36 @@ We proceed as follows using vectorization to calculate $X^{\prime}$ the randomiz
 In step (2), consider that the fraction of rows selected and the number of elements in the series should achieve the following:
 
 1. The values replaced in $X$ should come from the empirical distribution for the row (e.g., gene) of the replaced value. That is, there must be a high probability ($q_s$) of a row being selected by $\phi^R_k$ for some $k$.
-2. Low probability ($q_c$) of correlation between any two rows.
+2. High probability of no correlation between any two rows. For this, we consider the probability $q_c$ that for a pair of rows there exists at least one iteration when one row is selected and the other is not.
 
-We can calculate $q_s$ and $q_c$. $(1 - p)^K$ is the probability that a row is never selected by $f(K,p)$, and so $q_s = 1 - (1 - p)^K$. Two rows may have correlated values if they are always selected together by $\phi_k$ (if they are selected). The probability of not selecting two rows togther is $2p(1-p)$ and so $q_s = 1 - (2p (1-p))^K$. Thus,
+We can calculate $q_s$ and $q_c$. $(1 - p)^K$ is the probability that a row is never selected by $f(K,p)$, and so $q_s = 1 - (1 - p)^K$. 
+
+Two rows may have correlated values if they are always selected together by $\phi_k$. The probability of *not* selecting two rows togther at least once is $p^2 + (1-p)^2$ and so $q_c = 1 - (2p^2 -2p + 1)^K$. Thus,
 
 1. $q_s$ is large if $p$ is large and/or $K$ is large.
-2. $q_c$ is small if $p$ is close to 0.5 and/or $K$ is large.
+2. $q_c$ is large if $p$ is close to 0.25 and/or $K$ is large.
 
-From this, we conclude that $p \in [0.5, 1]$. We want to choose $p, K$ to minimize $max(1-q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
+From this, we conclude that $p \in [0.25, 1]$. We want to choose $p, K$ to maximize $min(q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
+
+## Alternative Algorithm
+
+A more computationally efficient approach works as follows is to ensure that each row has at most one value of $Y$ equal to one. So, $Y$ is constructed as follows:
+
+  1. Construct $Y_n$ (the $n$-th column of $Y$) by:
+     1. v is a vector of $M$ Bernoulli values with probability ${f}\over{N}$
+     1. $Y_n = v * (1-\sum_i^{n-1} Y_i) $. 
+  
+This procedure ensures that there's a single 1 in a row. However, we still have to be ca)reful about correlated rows.
+  
+  1. $Z$ is constructed by:
+     1. Randomly permuting the columns of $Y$ in the manner described in the previous section (by using successive subsets) to do sampling from the original data. In the alternative algorithm procedure, we do not need inverse permutations.
+     1. Extracting the replacement value by summing across columns (since there is at most one value per row) to produce a vector $z$ of $M$ values.
+     1. $Z = expand(z, N) * Y$, where $expand$ creates a $M \times N$ matrix by repeating values across the column.
+
+  1. As before, $X^{\prime} = X - X * Y + Z$.
+
+Note that for $p = 0.25$ and $K=10$, $q_c > 0.99$. And for $K=20$, $q_c > 0.9999$.
 
 ## Implementation Notes
 
-1. We can avoid matrix multiplication by using random permutations. It is useful to construct easily the inverse of a permutation. Let $\pi$ be a permutation and let $\pi^I$ be the identity permutation. Clearly, $\pi \circ \pi^{-1} = \pi^{-1} \circ \pi = \pi^I$. Let $x^I = (1, 2, \cdots, N)$. In general, a sequence $x$ of $N$ 1-based integers defines a permutation on $N$ in that $\pi_x (i) = x_i$. So, $\pi^{-1}_x (i) = x^I_{x_i}$. Note that $\pi^{-1}_x \circ \pi_x (i) = ?$
+1. Having a larger $K$ is unlikely to be costly since it's we're just changing pointers to columns, not moving data.
