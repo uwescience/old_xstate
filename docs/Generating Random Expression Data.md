@@ -1,7 +1,7 @@
 # Generating Random Expression Data
 Consider  $X = {x_{m,n} }$ where = $m \leq M$ and $n \leq N$. In our case, there are $M$ genes and $N$ times. We want to generate a new matrix is which $f$ of the values are changed in the following way. $x_{m,n}$ is unchanged with probability $1-f$. With probability $f$, $x_{m,n}$ is drawn uniformly from $\{x_{m,1}, \cdots, x_{m,N}\}$.
 
-## Algorithm
+## Algorithm 1
 
 We proceed as follows using vectorization to calculate $X^{\prime}$ the randomized version of $X$.
 
@@ -27,7 +27,7 @@ Two rows may have correlated values if they are always selected together by $\ph
 
 From this, we conclude that $p \in [0.25, 1]$. We want to choose $p, K$ to maximize $min(q_c, q_s)$ and minimize $K$. This can be done by numerical studies.
 
-## Alternative Algorithm
+## Algorithm 2
 
 A more computationally efficient approach works as follows is to ensure that each row has at most one value of $Y$ equal to one. So, $Y$ is constructed as follows:
 
@@ -45,6 +45,66 @@ This procedure ensures that there's a single 1 in a row. However, we still have 
   1. As before, $X^{\prime} = X - X * Y + Z$.
 
 Note that for $p = 0.25$ and $K=10$, $q_c > 0.99$. And for $K=20$, $q_c > 0.9999$.
+
+## Algorithm 3
+
+Throughout, columns are features and rows are observations.
+
+The first step is to sample with replacement from the empirical distribution for each feature. 
+
+    makeRandomRows(df, nobs):
+      # Randomly selects rows to create a
+      # dataframe with the desired number of rows. 
+      length = len(df)
+      sel_rows = randint(1, length, nobs)
+      return DataFrame(df.loc[sel_rows, :])
+    
+    makeEmpiricalRV(df, nobs):
+      # Generates random variables from the marginals of
+      # each feature with no correlation between features.
+      df_result = makeRandomRows(df, nobs)
+      # Remove correlations between columns
+      for _ in range(NUM_ITER):
+        row_idxs = randint(1, length, 
+            SUBSET_SIZE)
+        permuted_idxs = random.permutation(row_idxs)
+        df_result.loc[row_idxs, :] = 
+            df_result.loc[row_idxs, :]
+      return df_result
+      
+    makeSyntheticData(df, df_base, nobs, frac):
+      # Randomly selects observations (rows)
+      # and randomly replaces a subset of
+      # values (based on frac) in row based
+      # on empirical distribution in df_base.
+      df_rv = makeEmpiricalRV(df_base, nobs)
+      ncols = len(df.columns)
+      df_sel = DataFrame(random.bernoulli(
+          frac, nobs, ncols))
+      df_result = makeRandomRows(df, nobs)
+      df_result = df_result - df_result*df_sel
+          + df_rv*df_sel
+      return df_result
+      
+    makeClassData(df_class, nobs, fract):
+      # df_class: colums - features, "class"
+      # Result is dataframe with same schema and nobs 
+      # of each class
+      df_base = df_class[~CLASS]
+      dfs = []
+      for class in df_class[CLASS]:
+        df_subset = df_base[df_base[CLASS] == class]
+        df = makeSyntheticData(df_subset, df_base, nobs, frac)
+        df[CLASS] = class
+        dfs.append(df)
+      return concat(dfs)
+        
+ The following tests should be used:
+ 
+ - Distribution of the marginals is the same as the original empirical distribution.
+ - No correlation between features.
+ - Dataframes have the correct shape.       
+  
 
 ## Implementation Notes
 
