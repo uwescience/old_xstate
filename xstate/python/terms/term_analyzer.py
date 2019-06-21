@@ -79,7 +79,7 @@ class TermAnalyzer(object):
       df_matrix.columns = columns
     return df_matrix
 
-  def plotTermHeatmap(self):
+  def plotTermHeatmap(self, **plot_opts):
     """
     Plots of heatmap of the expressed genes (x-axis) vs. terms (y-axis). Values
     are binary.
@@ -87,5 +87,6 @@ class TermAnalyzer(object):
     # Create a matrix of expressed genes
     df_matrix = self.makeAnalyzerMatrix()
     #df_matrix = df_matrix.fillna(0)
+    opts = dict(plot_opts)
     opts = {cpn.PLT_CMAP: "Greys"}
     util_plots.plotCategoricalHeatmap(df_matrix, **opts)

@@ -115,6 +115,9 @@ def plotClusteredHeatmap(provider=None, ncluster=5, **kwargs):
   plotThresholdHeatmap(provider=provider, df=df,
       title="Clustered Differential Expression", **kwargs)
 
+# FIXME: Get an error related to the "condensed distance matrix"
+#        Suspect that this is because of dependencies resulting from
+#        correlated values for genes.
 def plotClustermap(provider=None, is_up_regulated=True, 
     is_plot=True):
   """

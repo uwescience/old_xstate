@@ -30,8 +30,7 @@ class TestTermAnalyzer(unittest.TestCase):
   def testPlotTermHeatmap(self):
     if IGNORE_TEST:
       return
-    self.analyzer.plotTermHeatmap()
-    import pdb; pdb.set_trace()
+    self.analyzer.plotTermHeatmap(is_plot=IS_PLOT)
 
 
 if __name__ == '__main__':
