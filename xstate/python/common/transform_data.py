@@ -27,3 +27,27 @@ def makeTrinaryData(df=None, min_abs=1.0, is_include_nan=True):
       df_result = df_result.applymap(
          lambda v: np.nan if v==0 else v)
   return df_result
+
+def aggregateGenes(df_trinary=None):
+  """
+  Combines genes that are perfectly correlated in time for trinary
+  values.
+  :param pd.DataFrame df_trinary:
+  :return pd.DataFrame: names are combined for aggregated
+      genes.
+  """
+  if df_trinary is None:
+    provider = DataProvider()
+    provider.do()
+    df = provider.df_normalized
+    df_trinary = makeTrinaryData(df, is_include_nan=False)
+  dfg = df_trinary.groupby(df_trinary.columns.tolist())
+  groups = dfg.groups
+  data = {}
+  for key, genes in groups.items():
+    label = "--".join(genes)
+    data[label] = list(key)
+  df = pd.DataFrame(data)
+  df_result = df.T
+  df_result.columns = df_trinary.columns
+  return df_result

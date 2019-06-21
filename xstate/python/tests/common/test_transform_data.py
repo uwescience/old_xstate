@@ -25,6 +25,14 @@ class TestDataTransformer(unittest.TestCase):
         df=self.provider.df_normalized)
     columns = self.provider.df_normalized.columns
     self.assertTrue(helpers.isValidDataFrame(df, columns))
+
+  def testAggregateGenes(self):
+    if IGNORE_TEST:
+      return
+    df_trinary = transform_data.makeTrinaryData(is_include_nan=False)
+    df = transform_data.aggregateGenes(df_trinary=df_trinary)
+    self.assertTrue(helpers.isValidDataFrame(df,
+        df_trinary.columns))
     
 
 if __name__ == '__main__':
