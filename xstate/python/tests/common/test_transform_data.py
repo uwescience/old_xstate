@@ -18,10 +18,10 @@ class TestDataTransformer(unittest.TestCase):
     self.provider = DataProvider()
     self.provider.do()
 
-  def testThresholdData(self):
+  def testMakeTrinaryData(self):
     if IGNORE_TEST:
       return
-    df = transform_data.thresholdData(
+    df = transform_data.makeTrinaryData(
         df=self.provider.df_normalized)
     columns = self.provider.df_normalized.columns
     self.assertTrue(helpers.isValidDataFrame(df, columns))

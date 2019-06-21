@@ -17,7 +17,7 @@ class DataGrouper(object):
     if df_trinary is None:
       provider = DataProvider()
       provider.do()
-      df_trinary = transform_data.thresholdData(
+      df_trinary = transform_data.makeTrinaryData(
           is_include_nan=False)
     self.df_trinary = df_trinary
     self.df_group = None  # Dataframe describing groups

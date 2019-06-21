@@ -70,7 +70,7 @@ def plotThresholdHeatmap(provider=None, df=None,
   provider = getProvider(provider)
   if df is None:
     df = provider.df_normalized
-    df_plot = transform_data.thresholdData(df, min_abs=min_abs)
+    df_plot = transform_data.makeTrinaryData(df, min_abs=min_abs)
   else:
     df_plot = df.copy()
   df_stages = provider.df_stage_matrix.copy()
@@ -104,7 +104,7 @@ def plotClusteredHeatmap(provider=None, ncluster=5, **kwargs):
   :param dict kwargs: plot parameters
   """
   provider = getProvider(provider)
-  df = transform_data.thresholdData(provider.df_normalized, is_include_nan=False)
+  df = transform_data.makeTrinaryData(provider.df_normalized, is_include_nan=False)
   df = util_dataframe.pruneSmallRows(df, min_abs=1.0)
   kmeans = KMeans(n_clusters=ncluster, random_state=0).fit(df)
   df[CLUSTER] = kmeans.labels_

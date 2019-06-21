@@ -86,5 +86,6 @@ class TermAnalyzer(object):
     """
     # Create a matrix of expressed genes
     df_matrix = self.makeAnalyzerMatrix()
-    import pdb; pdb.set_trace()
-    util_plots.plotCategoricalHeatmap(df_matrix)
+    #df_matrix = df_matrix.fillna(0)
+    opts = {cpn.PLT_CMAP: "Greys"}
+    util_plots.plotCategoricalHeatmap(df_matrix, **opts)

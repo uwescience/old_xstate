@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 
-def thresholdData(df=None, min_abs=1.0, is_include_nan=True):
+def makeTrinaryData(df=None, min_abs=1.0, is_include_nan=True):
   """
   Thresholds data based on its absolute magnitude.
   Values are assigned as -1, 0, 1
