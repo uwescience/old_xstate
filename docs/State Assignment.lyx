@@ -1,0 +1,296 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{babel}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding iso8859-15
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+State Assignment
+\end_layout
+
+\begin_layout Standard
+Given a vector 
+\begin_inset Formula $x$
+\end_inset
+
+ of gene expressions, state assignment determines which of several states
+ 
+\begin_inset Formula $s$
+\end_inset
+
+ in 
+\begin_inset Formula $S$
+\end_inset
+
+ is the best label for 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ This is a classification problem.
+\end_layout
+
+\begin_layout Standard
+In state assignment, we are given 
+\begin_inset Formula $[X^{T}S]$
+\end_inset
+
+, gene expression data paired with its associated state.
+ 
+\begin_inset Formula $X$
+\end_inset
+
+ has columns indexed by 
+\begin_inset Formula $K$
+\end_inset
+
+ gene (features) and 
+\begin_inset Formula $N$
+\end_inset
+
+ rows indexed by data instance.
+ Values in 
+\begin_inset Formula $X$
+\end_inset
+
+ are discrete.
+ In our case, values are 
+\begin_inset Formula $[-1,0,1]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We use the notataion 
+\begin_inset Formula $\sigma(x)=s$
+\end_inset
+
+ to denote that 
+\begin_inset Formula $s$
+\end_inset
+
+ is the state assigned to the vector 
+\begin_inset Formula $x$
+\end_inset
+
+ in 
+\begin_inset Formula $X^{T}$
+\end_inset
+
+.
+ The state assigned by algorithm 
+\begin_inset Formula $A$
+\end_inset
+
+ is 
+\begin_inset Formula $\sigma_{A}(x)$
+\end_inset
+
+.
+ Our objective in state assignment is to minimize 
+\begin_inset Formula $Pr(\sigma_{A}(x)\neq\sigma(x))$
+\end_inset
+
+ that probability that the state assigned by 
+\begin_inset Formula $A$
+\end_inset
+
+ differs from the true state.
+ We define 
+\begin_inset Formula $err(A,X)=\sum_{x\in X}1_{\sigma_{A}(x)\neq\sigma(x)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We use 
+\begin_inset Formula $\nu_{k}$
+\end_inset
+
+ to denote t
+\end_layout
+
+\begin_layout Section*
+Decision Tree Algorithm
+\end_layout
+
+\begin_layout Enumerate
+The algorithm recursively splits a set of instances based on the value of
+ a feature.
+ At the 
+\begin_inset Formula $i$
+\end_inset
+
+-th step of the algorithm, we are given 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+, a subset of the rows in 
+\begin_inset Formula $X$
+\end_inset
+
+.
+ The step returns 
+\begin_inset Formula $X_{i}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $X_{i}^{b}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\begin{vmatrix}X_{i}^{a}\\
+X_{i}^{b}
+\end{vmatrix}$
+\end_inset
+
+ is a permutation of the rows of 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Let 
+\begin_inset Formula $X_{1},\cdots,X_{M}$
+\end_inset
+
+ be the instances for the leaves.
+ Then, the error fraction is 
+\begin_inset Formula $\frac{1}{|X|}\sum_{m}err(A,X_{m})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+A step operates as follows: 1.
+ Compute 
+\begin_inset Formula $X_{i,k,v}^{a},X_{i,k,v}^{b}$
+\end_inset
+
+ for each feature 
+\begin_inset Formula $k$
+\end_inset
+
+ and feature value 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ 2.
+ 
+\begin_inset Formula $k=argmin_{k}\{\sum_{v}err(A,X_{i,k,v}^{a})+err(A,X_{i,k,v}^{b})\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Hyperparameters 1.
+ Tree depth 2.
+ Minimum 
+\begin_inset Formula $|X|$
+\end_inset
+
+ at a step
+\end_layout
+
+\begin_layout Enumerate
+Since we can generate an arbitrary amount of data, do repeated decision
+ trees on different training data.
+ These trees can be aggregated by calculating the mean and variance of the
+ depth of each node as well.
+\end_layout
+
+\begin_layout Section*
+Visualizations
+\end_layout
+
+\begin_layout Enumerate
+Visualize multiple trees using a heatmap.
+ x-axis is integer level in tree; y-axis is feature.
+ Value is frequency of occurrence.
+ Sort y-axis by mean value of level for feature.
+ Only include those features that appear in at least 
+\begin_inset Formula $m$
+\end_inset
+
+ trees.
+\end_layout
+
+\end_body
+\end_document
