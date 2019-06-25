@@ -29,10 +29,11 @@ class TestDataTransformer(unittest.TestCase):
   def testAggregateGenes(self):
     if IGNORE_TEST:
       return
-    df_trinary = transform_data.makeTrinaryData(is_include_nan=False)
-    df = transform_data.aggregateGenes(df_trinary=df_trinary)
+    provider = DataProvider()
+    provider.do()
+    df = transform_data.aggregateGenes(provider=provider)
     self.assertTrue(helpers.isValidDataFrame(df,
-        df_trinary.columns))
+        provider.df_normalized.columns))
     
 
 if __name__ == '__main__':
