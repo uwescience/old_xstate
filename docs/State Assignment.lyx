@@ -75,7 +75,7 @@
 \begin_body
 
 \begin_layout Title
-State Assignment
+State Assignment Using Decision Trees
 \end_layout
 
 \begin_layout Standard
@@ -183,113 +183,102 @@ We use
 \end_layout
 
 \begin_layout Section*
-Decision Tree Algorithm
+Technical Approach
 \end_layout
 
 \begin_layout Enumerate
-The algorithm recursively splits a set of instances based on the value of
- a feature.
- At the 
-\begin_inset Formula $i$
+Data preparation
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Eliminate 
+\begin_inset Formula $T_{0}$
 \end_inset
 
--th step of the algorithm, we are given 
-\begin_inset Formula $X_{i}$
+ since all 0's.
+\end_layout
+
+\begin_layout Enumerate
+Combine Normoxia with Resuscitation since insufficient values for Normoxia.
+\end_layout
+
+\begin_layout Enumerate
+Combine perfectly correlated features
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Analysis 1: All data
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Construct DT with all data
+\end_layout
+
+\begin_layout Enumerate
+Analyze the effective number of independent features given feature 
+\begin_inset Quotes eld
 \end_inset
 
-, a subset of the rows in 
-\begin_inset Formula $X$
+correlations
+\begin_inset Quotes erd
+\end_inset
+
+ (can we use correlation or need a new measure because of nominal values).
+\end_layout
+
+\begin_layout Enumerate
+Assess probability of uniquely identifying states under the null hypothesis
+ of random and independent assignment of expression values
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Analysis 2: Cross validation
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Compare misclassification rates with random for 5 classes
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Analysis 3: Sensitivity to random perturbations of the data
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Train on data with an error fraction 
+\begin_inset Formula $f$
 \end_inset
 
 .
- The step returns 
-\begin_inset Formula $X_{i}^{a}$
-\end_inset
-
- and 
-\begin_inset Formula $X_{i}^{b}$
-\end_inset
-
- such that 
-\begin_inset Formula $\begin{vmatrix}X_{i}^{a}\\
-X_{i}^{b}
-\end{vmatrix}$
-\end_inset
-
- is a permutation of the rows of 
-\begin_inset Formula $X_{i}$
-\end_inset
-
-.
+ Do repeatedly to see stability of features.
+ Relate to correlation blocks.
 \end_layout
 
 \begin_layout Enumerate
-Let 
-\begin_inset Formula $X_{1},\cdots,X_{M}$
-\end_inset
-
- be the instances for the leaves.
- Then, the error fraction is 
-\begin_inset Formula $\frac{1}{|X|}\sum_{m}err(A,X_{m})$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Enumerate
-A step operates as follows: 1.
- Compute 
-\begin_inset Formula $X_{i,k,v}^{a},X_{i,k,v}^{b}$
-\end_inset
-
- for each feature 
-\begin_inset Formula $k$
-\end_inset
-
- and feature value 
-\begin_inset Formula $v$
-\end_inset
-
-.
- 2.
- 
-\begin_inset Formula $k=argmin_{k}\{\sum_{v}err(A,X_{i,k,v}^{a})+err(A,X_{i,k,v}^{b})\}$
+Evaluate on new data with an error fraction 
+\begin_inset Formula $f$
 \end_inset
 
 
 \end_layout
 
-\begin_layout Enumerate
-Hyperparameters 1.
- Tree depth 2.
- Minimum 
-\begin_inset Formula $|X|$
-\end_inset
-
- at a step
-\end_layout
-
-\begin_layout Enumerate
-Since we can generate an arbitrary amount of data, do repeated decision
- trees on different training data.
- These trees can be aggregated by calculating the mean and variance of the
- depth of each node as well.
-\end_layout
-
+\end_deeper
 \begin_layout Section*
 Visualizations
 \end_layout
 
-\begin_layout Enumerate
-Visualize multiple trees using a heatmap.
- x-axis is integer level in tree; y-axis is feature.
- Value is frequency of occurrence.
- Sort y-axis by mean value of level for feature.
- Only include those features that appear in at least 
-\begin_inset Formula $m$
-\end_inset
+\begin_layout Section*
+Vectorized Implementation
+\end_layout
 
- trees.
+\begin_layout Enumerate
+
 \end_layout
 
 \end_body
