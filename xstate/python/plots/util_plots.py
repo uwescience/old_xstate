@@ -15,6 +15,7 @@ from sklearn.cluster import KMeans
 
 
 CLUSTER = "cluster"
+COLOR = "color"
 
 def getDF(df):
   """
@@ -35,26 +36,38 @@ def getProvider(provider):
   return provider
 
 def plotStateTransitions(provider=None, ymax=10e3, ax=None,
-    ex_timepoints=None, is_plot=True):
+    ex_timepoints=None, is_plot=True, **kwargs):
   """
   Plots vertical lines for state transitions.
   :param DataProvider provider:
   :param list-str ex_timepoints: timepoints to exclude. all if None
+  :param dict kwargs: plot arguments
   """
+  plot_args = dict(kwargs)
+  def setDefault(key, value):
+    if not key in plot_args:
+      plot_args[key] = value
+  # Find the state transition timepoints
+  setDefault("color", "blue")
   provider = getProvider(provider)
   df_stages = provider.df_stage_matrix
   if ex_timepoints is not None:
     df_stages = df_stages.drop(ex_timepoints)
+  last_name = None
+  timepoints = []
+  for index, row in df_stages.iterrows():
+    if row[cn.STAGE_NAME] != last_name:
+      timepoints.append(index)
+      last_name = row[cn.STAGE_NAME]
+  # Construct the plot
   if ax is None:
     ax = plt.gca()
+  setDefault(COLOR, "blue")
   ax.set_xlabel("times")
-  # Add the states
-  dfg = df_stages.groupby(cn.STAGE_NAME)
-  timepoints = df_stages.index.tolist()
-  for key in dfg.groups:
-    timepoint = dfg.groups[key][-1]
-    xval = timepoints.index(timepoint) + 1
-    ax.plot([xval, xval], [0, ymax], 'b--')
+  for timepoint in timepoints:
+    xval = df_stages.index.tolist().index(timepoint)
+    ax.plot([xval, xval], [0, ymax], linestyle="dashed", 
+        c=plot_args["color"])
   if is_plot:
     plt.show()
   return ax
@@ -119,9 +132,6 @@ def plotClusteredHeatmap(provider=None, ncluster=5, **kwargs):
   plotThresholdHeatmap(provider=provider, df=df,
       title="Clustered Differential Expression", **kwargs)
 
-# FIXME: Get an error related to the "condensed distance matrix"
-#        Suspect that this is because of dependencies resulting from
-#        correlated values for genes.
 def plotClustermap(provider=None, is_up_regulated=True, 
     is_plot=True):
   """
@@ -136,6 +146,7 @@ def plotClustermap(provider=None, is_up_regulated=True,
     df = df.applymap(lambda v: -v)
   df_filtered = util_statistics.filterZeroVarianceRows(df)
   df_log = util_statistics.calcLogSL(df_filtered)
+  df_log = df_log.applymap(lambda v: 1.0 if np.isnan(v) else v)
   # Construct a cluster map
   cg = sns.clustermap(df_log, col_cluster=False, 
       cbar_kws={"ticks":[0,5]}, cmap="Blues")

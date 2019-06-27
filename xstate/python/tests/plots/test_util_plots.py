@@ -7,8 +7,8 @@ import pandas as pd
 import unittest
 
 
-IGNORE_TEST = True
-IS_PLOT = True
+IGNORE_TEST = False
+IS_PLOT = False
 
 
 class TestFunctions(unittest.TestCase):
