@@ -7,17 +7,17 @@ import pandas as pd
 import unittest
 
 
-IGNORE_TEST = False
-IS_PLOT = False
+IGNORE_TEST = True
+IS_PLOT = True
 
 
 class TestFunctions(unittest.TestCase):
 
   def testPlotStateTransitions(self):
-    if IGNORE_TEST:
-      return
     # Smoke test only
     util_plots.plotStateTransitions(is_plot=IS_PLOT)
+    util_plots.plotStateTransitions(ex_timepoints=["T0"],
+        is_plot=IS_PLOT)
 
   def testPlotThresholdHeatmap(self):
     if IGNORE_TEST:

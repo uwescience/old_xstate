@@ -35,13 +35,16 @@ def getProvider(provider):
   return provider
 
 def plotStateTransitions(provider=None, ymax=10e3, ax=None,
-    is_plot=True):
+    ex_timepoints=None, is_plot=True):
   """
   Plots vertical lines for state transitions.
   :param DataProvider provider:
+  :param list-str ex_timepoints: timepoints to exclude. all if None
   """
   provider = getProvider(provider)
   df_stages = provider.df_stage_matrix
+  if ex_timepoints is not None:
+    df_stages = df_stages.drop(ex_timepoints)
   if ax is None:
     ax = plt.gca()
   ax.set_xlabel("times")
