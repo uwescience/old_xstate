@@ -57,6 +57,7 @@ def plotStateTransitions(provider=None, ymax=10e3, ax=None,
     ax.plot([xval, xval], [0, ymax], 'b--')
   if is_plot:
     plt.show()
+  return ax
 
 def plotThresholdHeatmap(provider=None, df=None, 
         ax=None, is_plot=True, min_abs=1.0, **kwargs):
