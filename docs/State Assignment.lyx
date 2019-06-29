@@ -186,11 +186,62 @@ We use
 Technical Approach
 \end_layout
 
-\begin_layout Enumerate
+\begin_layout Subsection*
 Data preparation
 \end_layout
 
+\begin_layout Enumerate
+Transform data to trinary values
+\end_layout
+
 \begin_deeper
+\begin_layout Enumerate
+Normalize for size of RNA library and gene length
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $log_{2}$
+\end_inset
+
+ values
+\end_layout
+
+\begin_layout Enumerate
+Convert 
+\begin_inset Formula $x$
+\end_inset
+
+, the values normalized as above, to trinary values.
+ 
+\begin_inset Formula $v\in\left\{ -1,0,1\right\} $
+\end_inset
+
+.
+ 
+\begin_inset Formula $v=-1$
+\end_inset
+
+ if 
+\begin_inset Formula $log_{2}x\leq-1$
+\end_inset
+
+, 
+\begin_inset Formula $v=1$
+\end_inset
+
+ if 
+\begin_inset Formula $log_{2}x\geq1$
+\end_inset
+
+.
+ Otherwise, 
+\begin_inset Formula $v=0$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
 \begin_layout Enumerate
 Eliminate 
 \begin_inset Formula $T_{0}$
@@ -207,7 +258,58 @@ Combine Normoxia with Resuscitation since insufficient values for Normoxia.
 Combine perfectly correlated features
 \end_layout
 
-\end_deeper
+\begin_layout Subsection*
+Trinary Values
+\end_layout
+
+\begin_layout Enumerate
+The trinary encoding is ordinal w.r.t.
+ the underlying values.
+\end_layout
+
+\begin_layout Enumerate
+Note that intuitions about variances are preserved.
+ For example, the sample variance of 
+\begin_inset Formula $v_{0,1}=(0,1,\cdots,1)$
+\end_inset
+
+ is the same as the sample variance of 
+\begin_inset Formula $v_{1,0}=(1,0,\cdots,0)$
+\end_inset
+
+.
+ That is, for vectors of length 
+\begin_inset Formula $n,$
+\end_inset
+
+ 
+\begin_inset Formula $E(v_{0,1})=\frac{n-1}{n}$
+\end_inset
+
+ and so 
+\begin_inset Formula $Var(v_{0,1})=\left(\frac{n-1}{n}\right)^{2}+(n-1)\left(1-\frac{n-1}{n}\right)^{2}$
+\end_inset
+
+
+\begin_inset Formula $=\left(1-\frac{1}{n}\right)^{2}+(n-1)\left(\frac{1}{n}\right)^{2}=Var(v_{1,0})$
+\end_inset
+
+ .
+ A similar argument applies to 
+\begin_inset Formula $v_{-1,0}=(-1,0,\cdots,0)$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{0,-1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection*
+Single Tree Analysis
+\end_layout
+
 \begin_layout Enumerate
 Analysis 1: All data
 \end_layout
@@ -269,16 +371,90 @@ Evaluate on new data with an error fraction
 \end_layout
 
 \end_deeper
+\begin_layout Subsection*
+Random Forests
+\end_layout
+
+\begin_layout Enumerate
+Create random forest with all features
+\end_layout
+
+\begin_layout Enumerate
+Construct the feature evaluation vector 
+\begin_inset Formula $E=\{e_{ij}\}$
+\end_inset
+
+ for features 
+\begin_inset Formula $j$
+\end_inset
+
+ and tree 
+\begin_inset Formula $i$
+\end_inset
+
+ such that 
+\begin_inset Formula $e_{ij}=score_{i}$
+\end_inset
+
+ if feature 
+\begin_inset Formula $j$
+\end_inset
+
+ is in tree 
+\begin_inset Formula $i$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Cluster the features creating 
+\begin_inset Formula $C_{1},\cdots,C_{M}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Find the clusters with the largest 
+\begin_inset Formula $\frac{1}{|C_{m}|}\sum_{j\in C_{m}}|e_{*j}|$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+For each
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Construct a decision tree with just its features
+\end_layout
+
+\begin_layout Enumerate
+Calculate the score
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Choose features in clusters with trees with the largest scores.
+\end_layout
+
+\begin_layout Enumerate
+Do random forest on the subset selected and which features co-occur in trees
+ and which do not.
+ Those that do not are likely equivalent.
+ Those that do co-occur are in some ways complementary.
+\end_layout
+
 \begin_layout Section*
 Visualizations
 \end_layout
 
 \begin_layout Section*
 Vectorized Implementation
-\end_layout
-
-\begin_layout Enumerate
-
 \end_layout
 
 \end_body
