@@ -259,6 +259,39 @@ Combine perfectly correlated features
 \end_layout
 
 \begin_layout Subsection*
+Method
+\end_layout
+
+\begin_layout Enumerate
+ensemble1 = Random Forest without boostrapping
+\end_layout
+
+\begin_layout Enumerate
+emsemble2 = Random Forest with bootstrapping
+\end_layout
+
+\begin_layout Enumerate
+top_features = top N features from emsemble1, ensemble2
+\end_layout
+
+\begin_layout Enumerate
+ensemble = RandomForest on top_features with bootstrapping
+\end_layout
+
+\begin_layout Enumerate
+Assess accuracy ensemble vs.
+ ensemble2
+\end_layout
+
+\begin_layout Enumerate
+Plot genes
+\end_layout
+
+\begin_layout Enumerate
+Construct concensus decision tree
+\end_layout
+
+\begin_layout Subsection*
 Trinary Values
 \end_layout
 
