@@ -17,7 +17,10 @@ class TestTrinaryData(unittest.TestCase):
     self.trinary = TrinaryData()
 
   def testConstructor(self):
-    self.assertIsNone(self.trinary.df_X)
+    self.assertTrue(isinstance(self.trinary.df_X, pd.DataFrame))
+    self.assertTrue(isinstance(self.trinary.ser_y, pd.Series))
+    self.assertTrue(isinstance(self.trinary.features, list))
+    self.assertTrue(isinstance(self.trinary.state_dict, dict))
 
   def testInit(self):
     self.trinary.init()
@@ -26,26 +29,7 @@ class TestTrinaryData(unittest.TestCase):
     self.assertEqual(len(self.trinary.df_X.columns),
         len(self.trinary.features))
     self.assertEqual(len(self.trinary.df_X),
-        len(self.trinary.ser_state))
-
-  def testGetX(self):
-    result = self.trinary.getX()
-    self.assertTrue(isinstance(result, pd.DataFrame))
-
-  def testGetState(self):
-    result = self.trinary.getState()
-    self.assertTrue(isinstance(result, pd.Series))
-
-  def testGetFeatures(self):
-    result = self.trinary.getFeatures()
-    self.assertTrue(isinstance(result, list))
-
-  def testStateDict(self):
-    result = self.trinary.getStateDict()
-    self.assertTrue(isinstance(result, dict))
-
-  
-    
+        len(self.trinary.ser_y))
     
 
 if __name__ == '__main__':

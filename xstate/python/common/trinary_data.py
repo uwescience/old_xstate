@@ -2,7 +2,7 @@
 """
 df_X - feature matrix with numeric column names.
        T0 is deleted
-ser_state - state values
+ser_y - state values
 features - names of genes
 state_dict - dictionary mapping string names to numbers
 """
@@ -20,8 +20,9 @@ class TrinaryData(object):
     self.provider = provider
     self.df_X = None  # Feature matrix indexed by number
     self.features = None
-    self.ser_state = None
+    self.ser_y = None
     self.state_dict = None
+    self.init()
 
   def init(self):
     self.df_X = transform_data.aggregateGenes(provider=self.provider)
@@ -30,37 +31,11 @@ class TrinaryData(object):
     self.features = self.df_X.columns.tolist()
     self.df_X.columns = range(len(self.features))
     # Create class information
-    ser_state = self.provider.df_stage_matrix[cn.STAGE_NAME]
-    ser_state = ser_state.drop(index="T0")
-    ser_state = ser_state.copy()
-    ser_state[ser_state == 'Normoxia'] = 'Resuscitation'
+    ser_y = self.provider.df_stage_matrix[cn.STAGE_NAME]
+    ser_y = ser_y.drop(index="T0")
+    ser_y = ser_y.copy()
+    ser_y[ser_y == 'Normoxia'] = 'Resuscitation'
     # Create converter from state name to numeric index
-    states = ser_state.unique()
+    states = ser_y.unique()
     self.state_dict = {k: v for v, k in enumerate(states)}
-    self.ser_state = ser_state.apply(lambda k: self.state_dict[k] )
-
-  def getX(self):
-    if self.df_X is None:
-      self.init()
-    return self.df_X
-
-  def getState(self):
-    if self.ser_state is None:
-      self.init()
-    return self.ser_state
-
-  def getFeatures(self):
-    if self.features is None:
-      self.init()
-    return self.features
-
-  def getStateDict(self):
-    if self.state_dict is None:
-      self.init()
-    return self.state_dict
-
-def makeFeatureColumns(provider):
-    df_X = transform_data.aggregateGenes(provider=provider)
-    df_X = df_X.T
-    return df_X.columns.tolist()
-
+    self.ser_y = ser_y.apply(lambda k: self.state_dict[k] )
