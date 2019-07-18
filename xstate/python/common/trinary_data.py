@@ -27,7 +27,7 @@ class TrinaryData(object):
     self.df_X = transform_data.aggregateGenes(provider=self.provider)
     self.df_X = self.df_X.T
     self.df_X = self.df_X.drop(index="T0")
-    self.features = self.df_X.columns
+    self.features = self.df_X.columns.tolist()
     self.df_X.columns = range(len(self.features))
     # Create class information
     ser_state = self.provider.df_stage_matrix[cn.STAGE_NAME]
@@ -49,7 +49,7 @@ class TrinaryData(object):
       self.init()
     return self.ser_state
 
-  def getFeature(self):
+  def getFeatures(self):
     if self.features is None:
       self.init()
     return self.features
