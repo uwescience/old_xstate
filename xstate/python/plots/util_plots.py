@@ -66,7 +66,7 @@ def plotStateTransitions(provider=None, ymax=10e3, ax=None,
   ax.set_xlabel("times")
   for timepoint in timepoints:
     xval = df_stages.index.tolist().index(timepoint)
-    ax.plot([xval, xval], [0, ymax], linestyle="dashed", 
+    ax.plot([xval, xval], [-ymax, ymax], linestyle="dashed", 
         c=plot_args["color"])
   if is_plot:
     plt.show()
