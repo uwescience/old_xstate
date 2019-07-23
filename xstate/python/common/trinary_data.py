@@ -1,6 +1,7 @@
-"""Normalized Trinary Data."""
+"""Normalized and Trinary Data."""
+
 """
-df_X - feature matrix with numeric column names.
+df_X - feature matrix values with numeric column names.
        T0 is deleted
 ser_y - state values
 features - names of genes
@@ -11,9 +12,14 @@ import common.constants as cn
 from common.data_provider import DataProvider
 import common.transform_data as transform_data
 
-class TrinaryData(object):
+
+class NormalizedData(object):
+  """ Exposes values described above. """
 
   def __init__(self, provider=None):
+    """
+    self.df_X are normalized read counts
+    """
     if provider is None:
       provider = DataProvider()
       provider.do()
@@ -22,11 +28,7 @@ class TrinaryData(object):
     self.features = None
     self.ser_y = None
     self.state_dict = None
-    self.init()
-
-  def init(self):
-    self.df_X = transform_data.aggregateGenes(provider=self.provider)
-    self.df_X = self.df_X.T
+    self.df_X = self.provider.df_normalized.T
     self.df_X = self.df_X.drop(index="T0")
     self.features = self.df_X.columns.tolist()
     self.df_X.columns = range(len(self.features))
@@ -39,3 +41,17 @@ class TrinaryData(object):
     states = ser_y.unique()
     self.state_dict = {k: v for v, k in enumerate(states)}
     self.ser_y = ser_y.apply(lambda k: self.state_dict[k] )
+
+
+class TrinaryData(NormalizedData):
+
+  def __init__(self, provider=None):
+    """
+    self.df_X are trinary values
+    """
+    super().__init__(provider=provider)
+    self.df_X = transform_data.aggregateGenes(provider=self.provider)
+    self.df_X = self.df_X.T
+    self.df_X = self.df_X.drop(index="T0")
+    self.features = self.df_X.columns.tolist()
+    self.df_X.columns = range(len(self.features))
