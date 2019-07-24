@@ -8,5 +8,8 @@ for d in common_python
     cd ..
   done
 #
+pushd xstate
+cd python
 PYTHONPATH=${PYTHONPATH}:`pwd`
 export PYTHONPATH
+popd
