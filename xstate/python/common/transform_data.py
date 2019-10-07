@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 
+# TODO: Should nan values be a trinary 0?
 def makeTrinaryData(df=None, min_abs=1.0, is_include_nan=True):
   """
   Thresholds data based on its absolute magnitude.
@@ -52,9 +53,9 @@ def aggregateGenes(provider=None):
   df_result.columns = df_trinary.columns
   return df_result
 
-def normalizeSample(csv_file, df_sample=None):
+def trinaryReadsDF(csv_file=None, df_sample=None):
   """
-  Normalizes one or more samples of readcounts. Normalizations involve:
+  Creates trinary values for read counts w.r.t. data provider.
   (a) adjusting for gene length, (b) library size, (c) log2, (d) ratio w.r.t. T0.
   Data may come from an existing dataframe or a CSV file.
   :param str csv_file: File in "samples" directory.
@@ -71,5 +72,44 @@ def normalizeSample(csv_file, df_sample=None):
     df_sample = pd.read_csv(csv_path)
     df_sample = df_sample.T
   #
-  df_normalized = normalizeGeneReads(df_sample)
+  df_normalized = provider.normalizeReadsDF(df_sample)
   # Compute trinary values relative to original reads
+  dfs = [provider.normalizeReadsDF(df) for df in provider.dfs_data]
+  df_ref = sum(dfs) / len(dfs)  # Mean values
+  ser_ref = df_ref[cn.REF_TIME]
+  return calcTrinaryComparison(df_normalized, ser_ref=ser_ref)
+
+def calcTrinaryComparison(df, ser_ref=None, threshold=1, is_convert_log2=True):
+  """
+  Calculates trinary values of a DataFrame w.r.t. a reference in
+  log2 units.
+  :param pd.Series ser_ref: reference values
+  :param pd.DataFrame df: comparison values; columns are instances,
+      has same inde as ser_ref
+  :param float threshold: comparison threshold.
+  :param bool is_convert_log2: convert to log2
+  :return pd.DataFrame: trinary values resulting from comparisons
+    -1: df is less than 2**threshold*ser_ref
+     1: df is greater than 2**threshol*ser_ref
+     0: otherwise
+  """
+  MINVAL = 1e-12
+  if is_convert_log2:
+    if not ser_ref is None:
+      ser_ref_log = ser_ref.apply(lambda v: np.log2(v))
+    df_log = df.applymap(lambda v: np.log2(v)
+        if v > MINVAL else np.log2(MINVAL))
+  else:
+    ser_ref_log = ser_ref
+    df_log = df
+  #
+  if ser_ref is None:
+    ser_ref_log = pd.Series(np.repeat(0, len(df)), index=df.index)
+  #
+  df_comp = pd.DataFrame()
+  for col in df.columns:
+    df_comp[col] = df_log[col] - ser_ref_log
+  df_result = df_comp.applymap(
+      lambda v: 0 if np.abs(v) < threshold else -1 if v < 0 else 1)
+  return df_result
+  
