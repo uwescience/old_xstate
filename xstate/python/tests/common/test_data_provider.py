@@ -77,13 +77,25 @@ class TestDataProvider(unittest.TestCase):
   def testMakeDataDFS(self):
     if IGNORE_TEST:
       return
+    def test(**kwargs):
+      dfs = self.provider._makeDataDFS(**kwargs)
+      self.assertEqual(len(dfs), data_provider.NUM_REPL)
+      for df in dfs:
+        self.assertGreater(len(df), 0)
+      return dfs
+    #
     self.init()
-    self.provider.df_gene_description =  \
-        self.provider._makeGeneDescriptionDF()
-    dfs = self.provider._makeDataDFS()
-    self.assertEqual(len(dfs), data_provider.NUM_REPL)
-    for df in dfs:
-      self.assertGreater(len(df), 0)
+    dfs1 = test()
+    dfs2 = test(is_normalize=False)
+    for idx in range(len(dfs1)):
+      df1 = dfs1[idx]
+      df2 = dfs2[idx]
+      for index in df1.index:
+        self.assertTrue(np.isclose(np.mean(df1.loc[index, :]), 0))
+        trues = [v >= 0 for v in df2.loc[index, :]]
+        self.assertTrue(all(trues))
+    #
+    dfs = self.provider._makeDataDFS(is_normalize=False)
 
   def testMakeHypoxiaDF(self):
     if IGNORE_TEST:
@@ -136,7 +148,7 @@ class TestDataProvider(unittest.TestCase):
         self.df_data.columns)
     self.assertEqual(len(difference), 0)
 
-  def testMakeDataDFS(self):
+  def testMakeDataDFS1(self):
     if IGNORE_TEST:
       return
     self.init()

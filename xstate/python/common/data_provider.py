@@ -1,9 +1,9 @@
 """
 Makes Data Available in Standard Formats.
-  gene_description DF
+  df_gene_description DF
     cn.GENE_ID (index), cn.GENE_NAME, cn.LENGTH, cn.PRODUCT, cn.START, cn.END, cn.STRAND
   Dataframes in dfs_data
-    cn.GENE_ID (index), time indices
+    cn.GENE_ID (index), columns: time indices
   hypoxia curve DF
     cn.SAMPLE, cn.HOURS, 0, 1, 2 (DO values), mean, std, cv
   df_normalized
@@ -70,15 +70,18 @@ class DataProvider(object):
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
-      is_only_qgenes=True):
+      is_only_qgenes=True, is_normalize=True):
     """
     :param bool is_normalized_wrtT0: normalize data w.r.t. T0
         Otherwise, standardize values using the mean.
     :param bool is_only_qgenes: only include genes included in multi-hypothesis test
+    :param bool is_normalize: Subtracts the mean counts in
+    calculation of dfs_data.
     """
     self._data_dir = data_dir
     self._is_normalized_wrtT0 = is_normalized_wrtT0
     self._is_only_qgenes = is_only_qgenes
+    self._is_normalize = is_normalize
     self._setValues()
 
   def _setValues(self, provider=None):
@@ -170,9 +173,10 @@ class DataProvider(object):
     """
     return pd.DataFrame([r for idx, r in df.iterrows() if idx in self.df_gene_description.index])
 
-  def _makeDataDFS(self):
+  def _makeDataDFS(self, is_normalize=True):
     """
     Creates a list of dataframes for each replication of the counts.
+    :param bool is_normalize: normalize the counts
     :return list-pd.DataFrame:
       indexed by GENE_ID
       column names are integers of time indices
@@ -205,12 +209,13 @@ class DataProvider(object):
         df_repl = df_repl.rename(columns=new_names)
         df_repl.index = df.index
         # Normalize values as a fraction of total expression as 1000 * fraction
-        for column in df_repl.columns:
-            df_repl[column] = df_repl[column] / df_repl[column].sum()
+        if is_normalize:
+          for column in df_repl.columns:
+              df_repl[column] = df_repl[column] / df_repl[column].sum()
         # Subtract the mean across times
-        df_repl_mean = df_repl.mean(axis=1)
-        for idx in df_repl_mean.index:
-          df_repl.loc[idx, :] = df_repl.loc[idx, :] - df_repl_mean[idx]
+          df_repl_mean = df_repl.mean(axis=1)
+          for idx in df_repl_mean.index:
+            df_repl.loc[idx, :] = df_repl.loc[idx, :] - df_repl_mean[idx]
         dfs.append(df_repl)
     #
     return dfs
@@ -287,6 +292,8 @@ class DataProvider(object):
     if persister.isExist():
       provider = persister.get()
       self._setValues(provider=provider)
+      if self._is_normalize != provider._is_normalize:
+        self.dfs_data = self._makeDataDFS(self._is_normalize)
     else:
       # Gene categorizations
       self.df_ec_terms =  \
@@ -311,7 +318,7 @@ class DataProvider(object):
       # Normalized data values
       self.df_normalized = self._makeNormalizedDF()
       # Time course data
-      self.dfs_data = self._makeDataDFS()
+      self.dfs_data = self._makeDataDFS(self._is_normalize)
       # Hypoxia data
       self.df_hypoxia = self._makeHypoxiaDF()
       # Create mean and std dataframes
