@@ -1,5 +1,6 @@
 from common import data_provider
 import common.constants as cn
+from common_python.testing import helpers
 from common_python.util.persister import Persister
 
 import copy
@@ -192,6 +193,21 @@ class TestDataProvider(unittest.TestCase):
     provider = data_provider.DataProvider()
     provider.do()
     self.provider.equals(provider)
+
+  def testNormalizeReadsDF(self):
+    if IGNORE_TEST:
+      return
+    provider = data_provider.DataProvider(is_normalize=False)
+    provider.do()
+    df = provider.dfs_data[0]
+    df_normalized = provider.normalizeReadsDF(df)
+    self.assertTrue(helpers.isValidDataFrame(df_normalized,
+        df.columns))
+    self.assertEqual(len(df), len(df_normalized))
+    ser_length = provider.df_gene_description[cn.LENGTH]
+    for col in df_normalized.columns:
+      total = (df_normalized[col]*ser_length).sum()
+      self.assertTrue(np.isclose(total, 1))
 
 
 if __name__ == '__main__':

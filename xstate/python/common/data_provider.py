@@ -210,8 +210,7 @@ class DataProvider(object):
         df_repl.index = df.index
         # Normalize values as a fraction of total expression as 1000 * fraction
         if is_normalize:
-          for column in df_repl.columns:
-              df_repl[column] = df_repl[column] / df_repl[column].sum()
+          df_repl = self.normalizeReadsDF(df_repl)
         # Subtract the mean across times
           df_repl_mean = df_repl.mean(axis=1)
           for idx in df_repl_mean.index:
@@ -248,6 +247,24 @@ class DataProvider(object):
       df = df[df.index.isin(keep_genes)]
     #
     return df
+ 
+  def normalizeReadsDF(self, df):
+    """
+    Adjusts read counts for each gene based on length and library size.
+    :param pd.DataFrame df: 
+        index are genes, columns are instances, values are readcounts
+    :return pd.DataFrame: 
+        index are genes, columns are instances, values are readcounts
+    """
+    # Adjust for library size
+    ser_tot = df.sum(axis=0)
+    df_result = df/ser_tot
+    # Adjust for gene length
+    for gene in df.index:
+      df_result.loc[gene, :] = df_result.loc[gene,:] \
+          / self.df_gene_description.loc[gene, cn.LENGTH]
+    #
+    return df_result
 
   def _makeStageMatrixDF(self):
     """

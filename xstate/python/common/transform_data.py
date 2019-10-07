@@ -73,23 +73,3 @@ def normalizeSample(csv_file, df_sample=None):
   #
   df_normalized = normalizeGeneReads(df_sample)
   # Compute trinary values relative to original reads
- 
-def normalizeGeneReadsDF(df):
-  """
-  Adjusts read counts for each gene based on length and library size.
-  :param pd.DataFrame df: 
-      index are genes, columns are instances, values are readcounts
-  :return pd.DataFrame: 
-      index are genes, columns are instances, values are readcounts
-  """
-  provider = DataProvider()
-  provider.do()
-  # Adjust for library size
-  ser_tot = df.sum(axis=0)
-  df_result = df/ser_tot
-  # Adjust for gene length
-  for gene in df.index:
-    df_result.loc[gene, :] = df_result.loc[gene,:] \
-        / provider.df_gene_description.loc[gene, cn.LENGTH]
-  #
-  return df_result

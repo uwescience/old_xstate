@@ -40,21 +40,6 @@ class TestDataTransformer(unittest.TestCase):
     self.assertTrue(helpers.isValidDataFrame(df,
         provider.df_normalized.columns))
 
-  def testNormalizeGeneReadsDF(self):
-    if IGNORE_TEST:
-      return
-    provider = DataProvider(is_normalize=False)
-    provider.do()
-    df = provider.dfs_data[0]
-    df_normalized = transform_data.normalizeGeneReadsDF(df)
-    self.assertTrue(helpers.isValidDataFrame(df_normalized,
-        df.columns))
-    self.assertEqual(len(df), len(df_normalized))
-    ser_length = provider.df_gene_description[cn.LENGTH]
-    for col in df_normalized.columns:
-      total = (df_normalized[col]*ser_length).sum()
-      self.assertTrue(np.isclose(total, 1))
-
   def testNormalizeSample(self):
     if IGNORE_TEST:
       return
