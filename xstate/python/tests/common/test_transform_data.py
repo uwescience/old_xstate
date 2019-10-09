@@ -1,5 +1,6 @@
 from common import transform_data
 import common.constants as cn
+from common.trinary_data import TrinaryData
 from common.data_provider import DataProvider
 from common_python.testing import helpers
 
@@ -40,7 +41,7 @@ class TestDataTransformer(unittest.TestCase):
     self.assertTrue(helpers.isValidDataFrame(df,
         provider.df_normalized.columns))
 
-  def testNormalizeSample(self):
+  def testTrinaryReadsDF1(self):
     if IGNORE_TEST:
       return
     provider = DataProvider(is_normalize=False)
@@ -55,6 +56,38 @@ class TestDataTransformer(unittest.TestCase):
     # Smoke tests for csv
     df_result = transform_data.trinaryReadsDF(
         csv_file="AM_MDM_Mtb_transcripts_DEseq.csv")
+
+  # TODO: Fix so working with the same transformation of features,
+  #       either all genes features or all gene-groups.
+  def testTrinaryReadsDF2(self):
+    return
+    # Checks that trinary values computed directly from reads
+    # are the same as those of normalized samples.
+    # Get raw value of read counts
+    provider = DataProvider(is_normalize=False)
+    provider.do()
+    #
+    def calcTrinaryTimeSample(time_index):
+        """
+        Calculates the trinary value of a time sample
+        :param str time_index: name of time value
+        """
+        int_index = int(time_index[1:])
+        df0 = provider.dfs_data[0]
+        num = len(provider.dfs_data)
+        ser = pd.Series(np.repeat(0, len(df0.index)), index=df0.index)
+        for idx in range(num):
+            ser += provider.dfs_data[idx][int_index]
+        df = pd.DataFrame(ser/num)
+        df_result = transform_data.trinaryReadsDF(df_sample=df)
+        return df_result.T
+    #
+    data = TrinaryData()
+    data.df_X.columns = data.features
+    for time_index in data.df_X.index:
+        df_result = calcTrinaryTimeSample(time_index)
+        import pdb; pdb.set_trace()
+        
     
 
   def testCalcTrinaryComparison(self):
