@@ -6,6 +6,7 @@ __pycache__/
 # Special files
 *.pcl  # pickle file
 .*.swp
+data_provider.pcl
 
 # C extensions
 *.so

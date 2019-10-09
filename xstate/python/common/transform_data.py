@@ -3,6 +3,7 @@
 from common import constants as cn
 from common.data_provider import DataProvider
 
+import os
 import pandas as pd
 import numpy as np
 
@@ -63,14 +64,15 @@ def trinaryReadsDF(csv_file=None, df_sample=None):
   :param pd.DataFrame df: columns are genes, index are instances, values are readcounts
   :param bool is_convert_to_trinary: return trinary values
   :return pd.DataFrame: columns are genes, indexes are instances, trinary values
-  At least one of df_sample and csv_path must be non-null
+  At least one of df_sample and csv_file must be non-null
   """
   provider = DataProvider(is_normalize=False)
   provider.do()
   if df_sample is None:
-    path = os.join(cn.SAMPLES_DIR, csv_file)
-    df_sample = pd.read_csv(csv_path)
-    df_sample = df_sample.T
+    path = os.path.join(cn.SAMPLES_DIR, csv_file)
+    df_sample = pd.read_csv(path)
+    df_sample.index = df_sample['GENE_ID']
+    del df_sample['GENE_ID']
   #
   df_normalized = provider.normalizeReadsDF(df_sample)
   # Compute trinary values relative to original reads

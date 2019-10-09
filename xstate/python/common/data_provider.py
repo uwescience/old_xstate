@@ -261,8 +261,13 @@ class DataProvider(object):
     df_result = df/ser_tot
     # Adjust for gene length
     for gene in df.index:
-      df_result.loc[gene, :] = df_result.loc[gene,:] \
-          / self.df_gene_description.loc[gene, cn.LENGTH]
+      if gene in self.df_gene_description.index:
+        df_result.loc[gene, :] = df_result.loc[gene,:] \
+            / self.df_gene_description.loc[gene, cn.LENGTH]
+      else:
+        msg1 = "normalizeReadsDF: could not find gene"
+        msg = "%s in df_gene_description: %s"
+        print(msg % (msg1, gene))
     #
     return df_result
 
