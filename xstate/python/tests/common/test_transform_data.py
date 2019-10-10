@@ -52,7 +52,7 @@ class TestDataTransformer(unittest.TestCase):
     dff = df_result + df_result.applymap(lambda v: -np.abs(v))
     frac_minus1 = -dff.sum().sum()  \
         /(2*len(df_result)*len(df_result.columns))
-    self.assertLess(frac_minus1, 0.2)
+    self.assertLess(frac_minus1, 0.25)
     # Smoke tests for csv
     df_result = transform_data.trinaryReadsDF(
         csv_file="AM_MDM_Mtb_transcripts_DEseq.csv")

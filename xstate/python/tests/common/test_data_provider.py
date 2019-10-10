@@ -85,7 +85,7 @@ class TestDataProvider(unittest.TestCase):
         self.assertGreater(len(df), 0)
       return dfs
     #
-    self.init()
+    self.provider.do()
     dfs1 = test()
     dfs2 = test(is_normalize=False)
     for idx in range(len(dfs1)):
@@ -149,19 +149,14 @@ class TestDataProvider(unittest.TestCase):
         self.df_data.columns)
     self.assertEqual(len(difference), 0)
 
-  def testMakeDataDFS1(self):
-    if IGNORE_TEST:
-      return
-    self.init()
-    dfs = self.provider._makeDataDFS()
-    self.assertEqual(len(dfs), data_provider.NUM_REPL)
-    [self.checkDF(df) for df in dfs]
-
   def testDo(self):
     if IGNORE_TEST:
       return
     self.init()
     self.provider.do()
+    self.assertEqual(len(self.provider.dfs_data),
+        data_provider.NUM_REPL)
+    [self.checkDF(df) for df in self.provider.dfs_data]
     dfs = [
         self.provider.df_gene_description,
         self.provider.df_mean,
@@ -197,7 +192,8 @@ class TestDataProvider(unittest.TestCase):
   def testNormalizeReadsDF(self):
     if IGNORE_TEST:
       return
-    provider = data_provider.DataProvider(is_normalize=False)
+    provider = data_provider.DataProvider(is_normalize=False,
+        is_only_qgenes=False)
     provider.do()
     df = provider.dfs_data[0]
     df_normalized = provider.normalizeReadsDF(df)

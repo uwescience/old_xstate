@@ -14,6 +14,7 @@ def makeTrinaryData(df=None, min_abs=1.0, is_include_nan=True):
   Thresholds data based on its absolute magnitude.
   Values are assigned as -1, 0, 1
   :param pd.DataFrame df: default is provider.df_normalized
+    values are in log2 units
   :param float min_abs: minimal absolute value to threshold.
   :param bool is_include_nan: Include nan values; else set to 0
   :return pd.DataFrame: same index and columns as df
@@ -30,18 +31,20 @@ def makeTrinaryData(df=None, min_abs=1.0, is_include_nan=True):
          lambda v: np.nan if v==0 else v)
   return df_result
 
-def aggregateGenes(provider=None):
+def aggregateGenes(df=None, provider=None):
   """
   Combines genes that are perfectly correlated in time for trinary
   values.
-  :param DataProvider provider:
+  :param DataFrame df: dataframe to transform
+  :param DataProvider provider: uses df_normalized
   :return pd.DataFrame: names are combined for aggregated
-      genes.
+      genes; calculates trinary values
   """
-  if provider is None:
-    provider = DataProvider()
-    provider.do()
-  df = provider.df_normalized
+  if df is None:
+    if provider is None:
+      provider = DataProvider()
+      provider.do()
+    df = provider.df_normalized
   df_trinary = makeTrinaryData(df, is_include_nan=False)
   dfg = df_trinary.groupby(df_trinary.columns.tolist())
   groups = dfg.groups

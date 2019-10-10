@@ -54,6 +54,7 @@ class DataProvider(object):
   # Instance variables in the class
   instance_variables = [
     "df_gene_description",  # information about the gene
+    "df_gene_expression_state",   # Genes expressed in each state
     "dfs_data",   # List of dataframes of counts for each replication
     "df_hypoxia",   # Hypoxia curve information
     "df_mean",   # Mean values of counts
@@ -61,7 +62,6 @@ class DataProvider(object):
     "df_cv",   # Coefficient of variation
     "df_normalized",   # Normalized data
     "df_stage_matrix",
-    "df_gene_expression_state",   # Genes expressed in each state
     "df_go_terms",
     "df_ec_terms",
     "df_ko_terms",
@@ -221,6 +221,7 @@ class DataProvider(object):
 
   def _makeNormalizedDF(self):
     """
+    Transformation of the "normalized Read Counts" processed by DESeq2.
     Standardized the values for each gene.
     Drops rows where all columns are minimum values.
     Assumes that self.df_gene_expression_state has been initialized.
@@ -250,7 +251,9 @@ class DataProvider(object):
  
   def normalizeReadsDF(self, df):
     """
-    Adjusts read counts for each gene based on length and library size.
+    Transforms a vector of read counts into features and units used in analysis.
+      1. Adjusts read counts for each gene based on length and library size.
+      2. Deletes unused features
     :param pd.DataFrame df: 
         index are genes, columns are instances, values are readcounts
     :return pd.DataFrame: 
@@ -268,6 +271,10 @@ class DataProvider(object):
         msg1 = "normalizeReadsDF: could not find gene"
         msg = "%s in df_gene_description: %s"
         print(msg % (msg1, gene))
+    # Find genes to keep
+    if self._is_only_qgenes:
+      keep_genes = self.df_gene_expression_state.index
+      df_result = df_result[df_result.index.isin(keep_genes)]
     #
     return df_result
 
