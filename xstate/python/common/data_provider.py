@@ -49,6 +49,8 @@ NUM_REPL = 3
 TIME_0 = "T0"
 MIN_LOG2_VALUE = -10
 MIN_VALUE = 10e-5
+MILLION = 1e6
+KILOBASE = 1e3  # Thousand bases
 
 class DataProvider(object):
   # Instance variables in the class
@@ -253,6 +255,7 @@ class DataProvider(object):
     """
     Transforms a vector of read counts into features and units used in analysis.
       1. Adjusts read counts for each gene based on length and library size.
+         Uses the metric RPKM - reads per kilobase millions
       2. Deletes unused features
     :param pd.DataFrame df: 
         index are genes, columns are instances, values are readcounts
@@ -260,12 +263,12 @@ class DataProvider(object):
         index are genes, columns are instances, values are readcounts
     """
     # Adjust for library size
-    ser_tot = df.sum(axis=0)
+    ser_tot = df.sum(axis=0)/MILLION
     df_result = df/ser_tot
     # Adjust for gene length
     for gene in df.index:
       if gene in self.df_gene_description.index:
-        df_result.loc[gene, :] = df_result.loc[gene,:] \
+        df_result.loc[gene, :] = KILOBASE*df_result.loc[gene,:] \
             / self.df_gene_description.loc[gene, cn.LENGTH]
       else:
         msg1 = "normalizeReadsDF: could not find gene"

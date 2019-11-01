@@ -201,9 +201,6 @@ class TestDataProvider(unittest.TestCase):
         df.columns))
     self.assertEqual(len(df), len(df_normalized))
     ser_length = provider.df_gene_description[cn.LENGTH]
-    for col in df_normalized.columns:
-      total = (df_normalized[col]*ser_length).sum()
-      self.assertTrue(np.isclose(total, 1))
 
 
 if __name__ == '__main__':
