@@ -47,6 +47,7 @@ DATA_PROVIDER_PERSISTER_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "data_provider.pcl")
 SAMPLES_DIR = os.path.join(DATA_DIR, "samples")
+ENSEMBLE_PATH = os.path.join(DATA_DIR, "ensemble.pcl")
 
 # Data Characeristics
 NUM_TIMES = 26
