@@ -57,22 +57,26 @@ def aggregateGenes(df=None, provider=None):
   df_result.columns = df_trinary.columns
   return df_result
 
-def trinaryReadsDF(csv_file=None, df_sample=None):
+def trinaryReadsDF(csv_file=None, df_sample=None,
+    csv_dir=cn.SAMPLES_DIR):
   """
   Creates trinary values for read counts w.r.t. data provider.
-  (a) adjusting for gene length, (b) library size, (c) log2, (d) ratio w.r.t. T0.
+  (a) adjusting for gene length, (b) library size,
+  (c) log2, (d) ratio w.r.t. T0.
   Data may come from an existing dataframe or a CSV file.
   :param str csv_file: File in "samples" directory.
       columns are: "GENE_ID", instance ids
-  :param pd.DataFrame df: columns are genes, index are instances, values are readcounts
-  :param bool is_convert_to_trinary: return trinary values
-  :return pd.DataFrame: columns are genes, indexes are instances, trinary values
+  :param pd.DataFrame df_sample: columns are genes,
+      index are instances, values are raw readcounts
+  :param str csv_dir: directory where csv file is found
+  :return pd.DataFrame: columns are genes, 
+      indexes are instances, trinary values
   At least one of df_sample and csv_file must be non-null
   """
   provider = DataProvider(is_normalize=False)
   provider.do()
   if df_sample is None:
-    path = os.path.join(cn.SAMPLES_DIR, csv_file)
+    path = os.path.join(csv_dir, csv_file)
     df_sample = pd.read_csv(path)
     df_sample.index = df_sample['GENE_ID']
     del df_sample['GENE_ID']
