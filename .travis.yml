@@ -24,4 +24,5 @@ script:
   - export PYTHONPATH
   - echo $PYTHONPATH
   - pwd
+  - ls -l common_python
   - nosetests xstate/python/tests
