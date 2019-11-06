@@ -19,7 +19,8 @@ install:
   - pip install matplotlib numpy pandas nose pyyaml
 
 script:
-  - cd data/biomodels; unzip *.zip > t.out; cd ..; cd ..
   - PYTHONPATH="`pwd`/xstate/python:`pwd`\common_python"
   - export PYTHONPATH
+  - echo $PYTHONPATH
+  - pwd
   - nosetests xstate/python/tests
