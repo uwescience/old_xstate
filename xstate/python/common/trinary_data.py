@@ -45,11 +45,11 @@ class NormalizedData(object):
 
 class TrinaryData(NormalizedData):
 
-  def __init__(self, is_dropT1=True):
+  def __init__(self, is_dropT1=True, is_display_errors=True):
     """
     self.df_X are trinary values
     """
-    super().__init__()
+    super().__init__(is_display_errors=is_display_errors)
     self.df_X = transform_data.aggregateGenes(provider=self.provider)
     self.df_X = self.df_X.T
     self.df_X = self.df_X.drop(index="T0")

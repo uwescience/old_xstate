@@ -33,7 +33,8 @@ def processExpressionData(data_file, data_dir=cn.SAMPLES_DIR,
       is_display_errors=is_display_errors)
   inv_dict = {v: k for k, v in trinary.state_dict.items()}
   path = os.path.join(data_dir, data_file)
-  df_trinary = transform_data.trinaryReadsDF(csv_file=path)
+  df_trinary = transform_data.trinaryReadsDF(csv_file=path,
+      is_display_errors=is_display_errors)
   df_classes = svm_ensemble.predict(df_trinary.T)
   columns = [inv_dict[v] for v in df_classes.columns]
   df_classes.columns = [inv_dict[v] for v in df_classes.columns]

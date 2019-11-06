@@ -26,7 +26,8 @@ class TestClassifyExpression(unittest.TestCase):
     if IGNORE_TEST:
       return
     classify_expression.processExpressionData(
-        TEST_EXPRESSION_FILE, output_path=TEST_PATH)
+        TEST_EXPRESSION_FILE, output_path=TEST_PATH,
+        is_display_errors=False)
     self.assertTrue(os.path.isfile(TEST_PATH))
       
 
