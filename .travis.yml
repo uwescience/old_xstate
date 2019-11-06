@@ -12,8 +12,8 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update --quiet conda
   - conda info --all
-  - conda env create --quiet --name sbmllint --file environment.yml
-  - source activate sbmllint
+  - conda env create --quiet --name xstate --file environment.yml
+  - source activate xstate
   - pip install --upgrade pip
   - conda install -c anaconda nose
   - pip install matplotlib numpy pandas nose pyyaml
