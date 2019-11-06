@@ -16,14 +16,14 @@ import common.transform_data as transform_data
 class NormalizedData(object):
   """ Exposes values described above. """
 
-  def __init__(self, provider=None):
+  def __init__(self, is_display_errors=True):
     """
     self.df_X are normalized read counts
     """
-    if provider is None:
-      provider = DataProvider()
-      provider.do()
-    self.provider = provider
+    self._is_display_errors = is_display_errors
+    self.provider = DataProvider(
+        is_display_errors=self._is_display_errors)
+    self.provider.do()
     self.df_X = None  # Feature matrix indexed by number
     self.features = None
     self.ser_y = None
@@ -45,11 +45,11 @@ class NormalizedData(object):
 
 class TrinaryData(NormalizedData):
 
-  def __init__(self, provider=None, is_dropT1=True):
+  def __init__(self, is_dropT1=True):
     """
     self.df_X are trinary values
     """
-    super().__init__(provider=provider)
+    super().__init__()
     self.df_X = transform_data.aggregateGenes(provider=self.provider)
     self.df_X = self.df_X.T
     self.df_X = self.df_X.drop(index="T0")

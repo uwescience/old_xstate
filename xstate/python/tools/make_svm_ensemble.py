@@ -30,21 +30,22 @@ def make(num_features=NUM_FEATURES,
       if one exists already.
   :return  ClassifierEnsemble:
   """
-  data = TrinaryData()
-  data.df_X.head()
   # See if there's a classifier already
   if not is_force:
     try:
-      return ClassifierEnsemble.deserialize(file_path)
+      return classifier_ensemble.ClassifierEnsemble.deserialize(
+          file_path)
     except ValueError:
       pass
   # Construct a new classifier
   svm_ensemble = classifier_ensemble.ClassifierEnsemble(
           classifier_ensemble.ClassifierDescriptorSVM(), 
           filter_high_rank=num_features, size=num_classifiers)
+  data = TrinaryData()
   data.df_X.columns = data.features
   svm_ensemble.fit(data.df_X, data.ser_y)
   svm_ensemble.serialize(file_path)
+  return svm_ensemble
 
 if __name__ == '__main__':
   # Do arg parse with errors
@@ -61,4 +62,4 @@ if __name__ == '__main__':
   args = parser.parse_args()
   make(num_features=args.numf, num_classifiers=args.numc,
       file_path=args.dest)
-  print("Classifier successfully constructed.")
+  print("Success!")

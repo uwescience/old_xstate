@@ -55,7 +55,8 @@ class TestDataTransformer(unittest.TestCase):
     self.assertLess(frac_minus1, 0.25)
     # Smoke tests for csv
     df_result = transform_data.trinaryReadsDF(
-        csv_file="AM_MDM_Mtb_transcripts_DEseq.csv")
+        csv_file="AM_MDM_Mtb_transcripts_DEseq.csv",
+        is_display_errors=False)
 
   # TODO: Fix so working with the same transformation of features,
   #       either all genes features or all gene-groups.

@@ -193,7 +193,7 @@ class TestDataProvider(unittest.TestCase):
     if IGNORE_TEST:
       return
     provider = data_provider.DataProvider(is_normalize=False,
-        is_only_qgenes=False)
+        is_only_qgenes=False, is_display_errors=False)
     provider.do()
     df = provider.dfs_data[0]
     df_normalized = provider.normalizeReadsDF(df)

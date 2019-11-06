@@ -58,7 +58,7 @@ def aggregateGenes(df=None, provider=None):
   return df_result
 
 def trinaryReadsDF(csv_file=None, df_sample=None,
-    csv_dir=cn.SAMPLES_DIR):
+    csv_dir=cn.SAMPLES_DIR, is_display_errors=True):
   """
   Creates trinary values for read counts w.r.t. data provider.
   (a) adjusting for gene length, (b) library size,
@@ -73,7 +73,8 @@ def trinaryReadsDF(csv_file=None, df_sample=None,
       indexes are instances, trinary values
   At least one of df_sample and csv_file must be non-null
   """
-  provider = DataProvider(is_normalize=False)
+  provider = DataProvider(is_normalize=False,
+      is_display_errors=is_display_errors)
   provider.do()
   if df_sample is None:
     path = os.path.join(csv_dir, csv_file)

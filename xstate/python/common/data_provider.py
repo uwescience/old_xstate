@@ -72,7 +72,8 @@ class DataProvider(object):
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
-      is_only_qgenes=True, is_normalize=True):
+      is_only_qgenes=True, is_normalize=True,
+      is_display_errors=True):
     """
     :param bool is_normalized_wrtT0: normalize data w.r.t. T0
         Otherwise, standardize values using the mean.
@@ -83,6 +84,7 @@ class DataProvider(object):
     self._data_dir = data_dir
     self._is_normalized_wrtT0 = is_normalized_wrtT0
     self._is_only_qgenes = is_only_qgenes
+    self._is_display_errors = is_display_errors
     self._is_normalize = is_normalize
     self._setValues()
 
@@ -271,9 +273,9 @@ class DataProvider(object):
         df_result.loc[gene, :] = KILOBASE*df_result.loc[gene,:] \
             / self.df_gene_description.loc[gene, cn.LENGTH]
       else:
-        msg1 = "normalizeReadsDF: could not find gene"
-        msg = "%s in df_gene_description: %s"
-        print(msg % (msg1, gene))
+        if self._is_display_errors:
+          msg = "**Warning: Data doesn't have gene %s" % gene
+          print(msg)
     # Find genes to keep
     if self._is_only_qgenes:
       keep_genes = self.df_gene_expression_state.index
