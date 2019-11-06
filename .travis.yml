@@ -16,8 +16,9 @@ install:
   - conda env create --quiet --name xstate --file environment.yml
   - source activate xstate
   - pip install --upgrade pip
-  - conda install -c anaconda nose
+  - conda install -c anaconda nose requests scipy seaborn
   - pip install matplotlib numpy pandas nose pyyaml
+  - pip install sklearn scipy seaborn
 
 script:
   - PYTHONPATH="`pwd`/xstate/python:`pwd`/common_python"
