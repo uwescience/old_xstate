@@ -20,7 +20,7 @@ install:
   - pip install matplotlib numpy pandas nose pyyaml
 
 script:
-  - PYTHONPATH="`pwd`/xstate/python:`pwd`\common_python"
+  - PYTHONPATH="`pwd`/xstate/python:`pwd`/common_python"
   - export PYTHONPATH
   - echo $PYTHONPATH
   - pwd
