@@ -1,8 +1,7 @@
 # xstate: State Analysis for Gene Expression
 
-<img
-   src="https://api.travis-ci.org/uwescience/xstate.svg?branch=master
-   style="float: left; margin-right: 10px;" />
+<img src="https://api.travis-ci.org/uwescience/xstate.svg?branch=master width="100"/>
+   
 
 ## Usage Notes
 1. Execute ``source setup_env.sh`` at the directory root
