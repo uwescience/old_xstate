@@ -16,24 +16,25 @@
    - Open a terminal session.
    - Type ``git --version``. If a git version number is returned, then git is installed.
 1. Install [miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
-1. Clone the repository using ``git clone https://github.com/ModelEngineering/xstate.git``
-1. Use git clone --recursive https://github.com/uwescience/xstate.git``
+1. Clone the repository using ``git clone https://github.com/uwescience/xstate.git``
+1. Use ``git clone --recursive https://github.com/uwescience/xstate.git``
 1. Change directory to the repo using ``cd xstate``
 1. Create a miniconda virtual environment  with dependencies
 using ``conda env create -f environment.yml``
 1. Start a new terminal session and change directory to ``xstate``.
-1. Activate the virtual environment using ``conda activate sbmllint``
-1. Install Tellurium using ``pip install tellurium``
+1. Activate the virtual environment using ``conda activate xstate``
 1. Deactivate the virtual environment using ``conda deactivate``
 
-To do GAMES and moiety analysis from the command line for a file path:
+Update the classifiers:
 1. Start a new terminal session.
 1. Change directory to the cloned repository.
-1. Activate the virtual environment
-1. There are copies of several BioModels files in ``data/biomodels`` or ``data\biomodels`` in Windows.
-Use ``/`` or ``\``  as appropriate for your system in the following instructions.
-   - To run games for a file in this directory, use
-``python xstate/tools/games.py data/biomodels/<file name>``
-   - To run moiety analysi for a file in this directory, use
-``python xstate/tools/moiety\_analysis.py data/biomodels/<file name>``
-1. Deactivate the virtual environment
+1. Activate the virtual environment.
+1. From the top level repository directory, ``python xstate/xstate/python/tools/make_svm_classifier.py``. (On windows, use ``\`` instead of ``/``.
+1. Deactivate the virtual environment.
+
+Run a classification:
+1. Start a new terminal session.
+1. Change directory to the cloned repository.
+1. Activate the virtual environment.
+1. From the top level repository directory, ``python xstate/xstate/python/tools/classify_expression.py <data_file>``. (On windows, use ``\`` instead of ``/``.
+1. Deactivate the virtual environment.
