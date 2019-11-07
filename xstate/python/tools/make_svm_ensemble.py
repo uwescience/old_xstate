@@ -1,5 +1,6 @@
 """Creates an SVM classifier from the time course expression data."""
 
+import add_path
 from common import constants as cn
 from common.trinary_data import TrinaryData
 from common_python.classifier import classifier_ensemble

@@ -1,5 +1,6 @@
 """Classifies expression data."""
 
+import add_path
 from common import constants as cn
 from common import trinary_data
 from common import transform_data
