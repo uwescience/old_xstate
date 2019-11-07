@@ -8,13 +8,18 @@ import pandas as pd
 import unittest
 
 
-IGNORE_TEST = False
+IGNORE_TEST = True
 IS_PLOT = False
 
 
 class TestTermMatrix(unittest.TestCase):
 
   def setUp(self):
+    if IGNORE_TEST:
+      return
+    self._init()
+ 
+  def _init(self):
     self.matrix = TermMatrix(is_plot=IS_PLOT)
 
   def testConstructor(self):
@@ -33,8 +38,8 @@ class TestTermMatrix(unittest.TestCase):
 
   def testPlotAggregation(self):
     # Only smoke tests
-    if IGNORE_TEST:
-      return
+    # TESTING
+    self._init()
     self.matrix.plotTimeAggregation(is_up_regulated=False)
     self.matrix.plotTimeAggregation(is_up_regulated=True)
 

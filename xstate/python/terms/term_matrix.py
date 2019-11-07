@@ -15,6 +15,7 @@ import seaborn as sns
 from scipy.spatial import distance
 from scipy.cluster.hierarchy import linkage, fcluster
 
+HIGH_SL = 1e6
 
 class TermMatrix(object):
 
@@ -196,6 +197,8 @@ class TermMatrix(object):
     df_filtered = util_statistics.filterZeroVarianceRows(df.T)
     # Compute significance levels
     df_log = util_statistics.calcLogSL(df_filtered, round_decimal=3)
+    df_log = df_log.applymap(lambda v:
+        HIGH_SL if np.isnan(v) else v)
     # Compute the clusters
     log_arrays = np.asarray(df_log)
     row_linkage = linkage(
