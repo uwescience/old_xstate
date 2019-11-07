@@ -2,10 +2,21 @@
 import os
 import sys
 
+TEST_DIR = "test"
+XSTATE = "xstate"
+
 def getRootDir():
   root_dir = os.path.dirname(os.path.abspath(__file__))
-  for _ in range(4):  # Root is 3 directories up
+  found_xstate = False
+  done = False
+  while not done:
     root_dir = os.path.dirname(root_dir)
+    _, this_dir = os.path.split(root_dir)
+    if this_dir == XSTATE:
+      if found_xstate:
+        done = True
+      else:
+        found_xstate = True
   return root_dir
 
 def add_paths():
