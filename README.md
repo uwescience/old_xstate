@@ -16,8 +16,7 @@
    - Open a terminal session.
    - Type ``git --version``. If a git version number is returned, then git is installed.
 1. Install [miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
-1. Clone the repository using ``git clone https://github.com/uwescience/xstate.git``
-1. Use ``git clone --recursive https://github.com/uwescience/xstate.git``
+1. Clone the repository using ``git clone --recursive https://github.com/uwescience/xstate.git``
 1. Change directory to the repo using ``cd xstate``
 1. Create a miniconda virtual environment  with dependencies
 using ``conda env create -f environment.yml``
