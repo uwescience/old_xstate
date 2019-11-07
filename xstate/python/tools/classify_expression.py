@@ -49,7 +49,7 @@ if __name__ == '__main__':
   parser.add_argument('dfile',
       help='path to file containing expression data (csv)',
       type=str)
-  parser.add_argument('--dfile', '-d',
+  parser.add_argument('--dir', '-d',
        help='directory containing input expression data files',
       default=OUTPUT_PATH)
   parser.add_argument('--pfile', '-p',
@@ -59,6 +59,6 @@ if __name__ == '__main__':
        help='output file path with classifier results (csv)',
       default=OUTPUT_PATH)
   args = parser.parse_args()
-  processExpressionData(args.dfile, parameter_file=args.pfile,
+  processExpressionData(args.dir, parameter_file=args.pfile,
       output_path=args.ofile)
   print("Success!")
