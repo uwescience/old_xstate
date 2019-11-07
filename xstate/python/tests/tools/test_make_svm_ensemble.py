@@ -1,3 +1,9 @@
+import sys
+import os
+this_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, this_dir)
+#
+import add_path
 import common.constants as cn
 from common_python.classifier import classifier_ensemble
 from tools import make_svm_ensemble

@@ -1,5 +1,9 @@
-import common.constants as cn
-from tools import add_path
+import sys
+import os
+this_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, this_dir)
+#
+import add_path
 
 import os
 import sys

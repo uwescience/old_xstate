@@ -1,3 +1,9 @@
+import sys
+import os
+this_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, this_dir)
+#
+import add_path
 import common.constants as cn
 from tools import classify_expression
 

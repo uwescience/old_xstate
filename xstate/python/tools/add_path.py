@@ -3,9 +3,9 @@ import os
 import sys
 
 def getRootDir():
-  root_dir = sys.path[0]
-  for _ in range(3):  # Root is 3 directories up
-    root_dir, _ = os.path.split(root_dir)
+  root_dir = os.path.dirname(os.path.abspath(__file__))
+  for _ in range(4):  # Root is 3 directories up
+    root_dir = os.path.dirname(root_dir)
   return root_dir
 
 def add_paths():
@@ -18,5 +18,4 @@ def add_paths():
   sys.path.insert(0, common_dir)
 
 
-if __name__ == '__main__':
-  add_paths()
+add_paths()
