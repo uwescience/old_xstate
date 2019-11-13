@@ -20,16 +20,12 @@
 1. Change directory to the repo using ``cd xstate``
 1. Create a miniconda virtual environment  with dependencies
 using ``conda env create -f environment.yml``
-1. Start a new terminal session and change directory to ``xstate``.
-1. Activate the virtual environment using ``conda activate xstate``
-1. Deactivate the virtual environment using ``conda deactivate``
 
 Update the classifiers:
-1. Start a new terminal session.
-1. Change directory to the cloned repository.
-1. Activate the virtual environment.
+1. Start a new terminal session and change directory to ``xstate``.
+1. Activate the virtual environment using ``conda activate xstate``
 1. From the top level repository directory, ``python xstate/xstate/python/tools/make_svm_classifier.py``. (On windows, use ``\`` instead of ``/``.
-1. Deactivate the virtual environment.
+1. Deactivate the virtual environment using ``conda deactivate``
 
 Run a classification:
 1. Start a new terminal session.
