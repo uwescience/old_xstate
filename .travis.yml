@@ -22,5 +22,5 @@ install:
 
 script:
   - PYTHONPATH="`pwd`/xstate/python:`pwd`/common_python"
-  - export PYTHONPATH
+  - export PYTHONPATH1
   - nosetests xstate/python/tests
