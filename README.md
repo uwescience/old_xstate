@@ -28,9 +28,7 @@ Update the classifiers:
 1. Deactivate the virtual environment using ``conda deactivate``
 
 Run a classification:
-1. Start a new terminal session.
-1. Change directory to the cloned repository.
-1. Activate the virtual environment.
+1. Start a new terminal session, change directory to ``xstate``, and activate the virtual environment.
 1. From the top level repository directory, ``python xstate/xstate/python/tools/classify_expression.py <data_file>``. (On windows, use ``\`` instead of ``/``. Note: It is assumed that \<data file\> is
 in the ``samples`` directory under ``data``. To change the directory,
 use the ``--dir`` option.
