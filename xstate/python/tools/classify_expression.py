@@ -47,11 +47,11 @@ if __name__ == '__main__':
   desc = 'Classifies gene expression data.'
   parser = argparse.ArgumentParser(description=desc)
   parser.add_argument('dfile',
-      help='path to file containing expression data (csv)',
+      help='file containing expression data (csv)',
       type=str)
   parser.add_argument('--dir', '-d',
        help='directory containing input expression data files',
-      default=OUTPUT_PATH)
+      default=cn.SAMPLES_DIR)
   parser.add_argument('--pfile', '-p',
        help='classifier parameter file',
       default=cn.ENSEMBLE_PATH)
@@ -59,6 +59,7 @@ if __name__ == '__main__':
        help='output file path with classifier results (csv)',
       default=OUTPUT_PATH)
   args = parser.parse_args()
-  processExpressionData(args.dir, parameter_file=args.pfile,
+  processExpressionData(args.dfile, 
+      data_dir=args.dir, parameter_file=args.pfile,
       output_path=args.ofile)
   print("Success!")
