@@ -7,7 +7,7 @@
 1. Run python codes from the directory src/python
 
 ## Installation
-1. Use ``git clone --recursive https://github.com/uwescience/xstate.git``
+1. Use ``git clone --recursive-submodules https://github.com/uwescience/xstate.git``
 
 ## Installation and Usage
 
