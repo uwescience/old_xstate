@@ -1,6 +1,18 @@
-#conda install rpy2 tzlocal
-conda install -c r r-essentials
-conda install rstudio
-conda install -c anaconda nose
-conda install seaborn graphviz
-source setup_env.sh  # setup the execution environment
+#! /bin/bash
+# arg1: name-of-environment
+if [ -z "$1" ]
+then
+      echo "Usage: 'setup.sh <env name>'"
+      echo "       Defaulting to 'xstate'"
+      NAME="xstate"
+else
+      NAME=$1
+fi
+# Setup for project
+conda config --set always_yes yes --set changeps1 no
+conda update --quiet conda
+conda info --all
+conda env create --quiet --name ${NAME} --file environment.yml
+conda install jupyter notebook
+echo "**Use conda activate ${NAME} to enter environment"
+echo "  Use conda deactive to leave environment"

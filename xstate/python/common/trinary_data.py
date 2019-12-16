@@ -16,18 +16,19 @@ import common.transform_data as transform_data
 class NormalizedData(object):
   """ Exposes values described above. """
 
-  def __init__(self, is_display_errors=True):
+  def __init__(self, is_display_errors=True, is_averaged=True):
     """
-    self.df_X are normalized read counts
+    :param bool is_display_errors: Shows errors encountered
+    :param bool is_averaged: Use averaged read counts
+    Public instance variables:
+      df_X are normalized read counts
+      states_dict - mapping of literal to numeric values of state
+      ser_y - numeric value of state corresponding to each row in df_X
     """
     self._is_display_errors = is_display_errors
     self.provider = DataProvider(
         is_display_errors=self._is_display_errors)
     self.provider.do()
-    self.df_X = None  # Feature matrix indexed by number
-    self.features = None
-    self.ser_y = None
-    self.state_dict = None
     self.df_X = self.provider.df_normalized.T
     self.df_X = self.df_X.drop(index="T0")
     self.features = self.df_X.columns.tolist()

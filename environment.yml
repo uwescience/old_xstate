@@ -1,12 +1,14 @@
-name: xstate
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - numpy=1.16.3
-  - pandas=0.22
-  - python=3.6.7
-  - xlrd
+  - numpy
+  - pandas
+  - python
+  - matplotlib
   - nose
-  - pyyaml
-prefix: /home//anaconda3/envs/xstate
+  - seaborn
+  - scipy
+  - graphviz
+  - scikit-learn
+  - notebook
