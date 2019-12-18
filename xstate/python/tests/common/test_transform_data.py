@@ -44,9 +44,9 @@ class TestDataTransformer(unittest.TestCase):
   def testTrinaryReadsDF1(self):
     if IGNORE_TEST:
       return
-    provider = DataProvider(is_normalize=False)
+    provider = DataProvider()
     provider.do()
-    df = provider.dfs_data[0]
+    df = provider.dfs_read_count[0]
     df_result = transform_data.trinaryReadsDF(df_sample=df)
     # See if number of "-1" is excessive
     dff = df_result + df_result.applymap(lambda v: -np.abs(v))
@@ -65,7 +65,7 @@ class TestDataTransformer(unittest.TestCase):
     # Checks that trinary values computed directly from reads
     # are the same as those of normalized samples.
     # Get raw value of read counts
-    provider = DataProvider(is_normalize=False)
+    provider = DataProvider()
     provider.do()
     #
     def calcTrinaryTimeSample(time_index):
@@ -74,11 +74,11 @@ class TestDataTransformer(unittest.TestCase):
         :param str time_index: name of time value
         """
         int_index = int(time_index[1:])
-        df0 = provider.dfs_data[0]
-        num = len(provider.dfs_data)
+        df0 = provider.dfs_read_count[0]
+        num = len(provider.dfs_read_count)
         ser = pd.Series(np.repeat(0, len(df0.index)), index=df0.index)
         for idx in range(num):
-            ser += provider.dfs_data[idx][int_index]
+            ser += provider.dfs_read_count[idx][int_index]
         df = pd.DataFrame(ser/num)
         df_result = transform_data.trinaryReadsDF(df_sample=df)
         return df_result.T

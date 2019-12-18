@@ -2,6 +2,7 @@ from common import data_provider
 import common.constants as cn
 from common_python.testing import helpers
 from common_python.util.persister import Persister
+import common_python.util.dataframe as dataframe
 
 import copy
 import numpy as np
@@ -33,7 +34,7 @@ class TestDataProvider(unittest.TestCase):
 
   def makeData(self, size=SIZE):
     df_data = pd.DataFrame({'a': range(10)})
-    self.provider.dfs_data = [df_data for _ in range(SIZE)]
+    self.provider.dfs_centered_adjusted_read_count = [df_data for _ in range(SIZE)]
 
   def checkDF(self, df, is_check_index=True):
     """
@@ -75,29 +76,6 @@ class TestDataProvider(unittest.TestCase):
     df = self.provider._makeDFFromCSV(data_provider.FILENAME_HYPOXIA)
     self.assertGreater(len(df), 0)
 
-  def testMakeDataDFS(self):
-    if IGNORE_TEST:
-      return
-    def test(**kwargs):
-      dfs = self.provider._makeDataDFS(**kwargs)
-      self.assertEqual(len(dfs), data_provider.NUM_REPL)
-      for df in dfs:
-        self.assertGreater(len(df), 0)
-      return dfs
-    #
-    self.provider.do()
-    dfs1 = test()
-    dfs2 = test(is_normalize=False)
-    for idx in range(len(dfs1)):
-      df1 = dfs1[idx]
-      df2 = dfs2[idx]
-      for index in df1.index:
-        self.assertTrue(np.isclose(np.mean(df1.loc[index, :]), 0))
-        trues = [v >= 0 for v in df2.loc[index, :]]
-        self.assertTrue(all(trues))
-    #
-    dfs = self.provider._makeDataDFS(is_normalize=False)
-
   def testMakeHypoxiaDF(self):
     if IGNORE_TEST:
       return
@@ -120,7 +98,7 @@ class TestDataProvider(unittest.TestCase):
     if IGNORE_TEST:
       return
     self.init()
-    self.provider.dfs_data = range(3)
+    self.provider.dfs_centered_adjusted_read_count = range(3)
     self.assertEqual(self.provider._getNumRepl(), 3)
 
   def testMakeMeanDF(self):
@@ -129,7 +107,8 @@ class TestDataProvider(unittest.TestCase):
     self.init()
     self.makeData()
     df = self.provider._makeMeanDF()
-    self.assertTrue(df.equals(self.provider.dfs_data[0]))
+    df = df.applymap(lambda v: int(v))
+    self.assertTrue(df.equals(self.provider.dfs_centered_adjusted_read_count[0]))
 
   def testMakeStdDF(self):
     if IGNORE_TEST:
@@ -152,11 +131,25 @@ class TestDataProvider(unittest.TestCase):
   def testDo(self):
     if IGNORE_TEST:
       return
+    def testLessEqual(dfs1, dfs2):
+      for idx in range(len(dfs1)):
+        df1 = dfs1[idx]
+        df2 = dfs2[idx]
+        for gene in df1.index:
+          ser = df1.loc[gene, :] <= df2.loc[gene, :]
+          self.assertEqual(ser.sum(),  len(ser))
+    #
     self.init()
     self.provider.do()
-    self.assertEqual(len(self.provider.dfs_data),
+    # Specific tests
+    testLessEqual(self.provider.dfs_centered_adjusted_read_count,
+        self.provider.dfs_adjusted_read_count)
+    # Common tests
+    self.assertEqual(
+        len(self.provider.dfs_centered_adjusted_read_count),
         data_provider.NUM_REPL)
-    [self.checkDF(df) for df in self.provider.dfs_data]
+    [self.checkDF(df) for df in 
+        self.provider.dfs_centered_adjusted_read_count]
     dfs = [
         self.provider.df_gene_description,
         self.provider.df_mean,
@@ -165,7 +158,9 @@ class TestDataProvider(unittest.TestCase):
         self.provider.df_normalized,
         self.provider.df_gene_expression_state,
         ]
-    dfs.extend(self.provider.dfs_data)
+    dfs.extend(self.provider.dfs_centered_adjusted_read_count)
+    dfs.extend(self.provider.dfs_read_count)
+    dfs.extend(self.provider.dfs_adjusted_read_count)
     [self.checkDF(df) for df in dfs]
     dfs = [
         self.provider.df_kegg_gene_pathways, 
@@ -192,10 +187,10 @@ class TestDataProvider(unittest.TestCase):
   def testNormalizeReadsDF(self):
     if IGNORE_TEST:
       return
-    provider = data_provider.DataProvider(is_normalize=False,
+    provider = data_provider.DataProvider(
         is_only_qgenes=False, is_display_errors=False)
     provider.do()
-    df = provider.dfs_data[0]
+    df = provider.dfs_read_count[0]
     df_normalized = provider.normalizeReadsDF(df)
     self.assertTrue(helpers.isValidDataFrame(df_normalized,
         df.columns))

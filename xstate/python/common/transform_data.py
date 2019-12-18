@@ -73,8 +73,7 @@ def trinaryReadsDF(csv_file=None, df_sample=None,
       indexes are instances, trinary values
   At least one of df_sample and csv_file must be non-null
   """
-  provider = DataProvider(is_normalize=False,
-      is_display_errors=is_display_errors)
+  provider = DataProvider(is_display_errors=is_display_errors)
   provider.do()
   if df_sample is None:
     path = os.path.join(csv_dir, csv_file)
@@ -84,8 +83,8 @@ def trinaryReadsDF(csv_file=None, df_sample=None,
   #
   df_normalized = provider.normalizeReadsDF(df_sample)
   # Compute trinary values relative to original reads
-  dfs = [provider.normalizeReadsDF(df) for df in provider.dfs_data]
-  df_ref = sum(dfs) / len(dfs)  # Mean values
+  df_ref = sum(provider.dfs_adjusted_read_count)  \
+      / len(provider.dfs_adjusted_read_count)  # Mean values
   ser_ref = df_ref[cn.REF_TIME]
   return calcTrinaryComparison(df_normalized, ser_ref=ser_ref)
 

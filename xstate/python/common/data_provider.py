@@ -1,13 +1,14 @@
 """
-Makes Data Available in Standard Formats.
+Makes Data Available in Standard Formats. Creates the following data:
   df_gene_description DF
     cn.GENE_ID (index), cn.GENE_NAME, cn.LENGTH, cn.PRODUCT, cn.START, cn.END, cn.STRAND
-  Dataframes in dfs_data
+  Dataframes in dfs_centered_adjusted_read_count
     cn.GENE_ID (index), columns: time indices
   hypoxia curve DF
     cn.SAMPLE, cn.HOURS, 0, 1, 2 (DO values), mean, std, cv
   df_normalized
-    cn.GENE_ID (index), time indices
+     index: cn.GENE_ID
+     column: time
   df_mean,   # Mean values of counts
   df_std,   # Std of count values
   df_cv,   # Coefficient of variation
@@ -23,6 +24,15 @@ Makes Data Available in Standard Formats.
     cpn.KEGG_PATHWAY cpn.DESCRIPTION
   df_kegg_gene_pathways
     cn.GENE_ID cpn.KEGG_PATHWAY
+  dfs_read_count - raw read count dataframes
+     index: cn.GENE_ID
+     column: time
+  dfs_adjusted_read_count - readcounts adjusted w.r.t. library size, gene length
+     index: cn.GENE_ID
+     column: time
+  dfs_centered_adjusted_read_count - centers w.r.t. mean value of gene
+     index: cn.GENE_ID
+     column: time
 """
 
 import common.constants as cn
@@ -55,37 +65,35 @@ KILOBASE = 1e3  # Thousand bases
 class DataProvider(object):
   # Instance variables in the class
   instance_variables = [
-    "df_gene_description",  # information about the gene
-    "df_gene_expression_state",   # Genes expressed in each state
-    "dfs_data",   # List of dataframes of counts for each replication
-    "df_hypoxia",   # Hypoxia curve information
-    "df_mean",   # Mean values of counts
-    "df_std",   # Std of count values
-    "df_cv",   # Coefficient of variation
-    "df_normalized",   # Normalized data
+    "df_gene_description",
+    "df_gene_expression_state",
+    "df_hypoxia",
+    "df_mean",
+    "df_std",
+    "df_cv",
+    "df_normalized",
     "df_stage_matrix",
     "df_go_terms",
     "df_ec_terms",
     "df_ko_terms",
     "df_kegg_pathways",
     "df_kegg_gene_pathways",
+    "dfs_adjusted_read_count",
+    "dfs_centered_adjusted_read_count",
+    "dfs_read_count",
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
-      is_only_qgenes=True, is_normalize=True,
-      is_display_errors=True):
+      is_only_qgenes=True, is_display_errors=True):
     """
     :param bool is_normalized_wrtT0: normalize data w.r.t. T0
         Otherwise, standardize values using the mean.
     :param bool is_only_qgenes: only include genes included in multi-hypothesis test
-    :param bool is_normalize: Subtracts the mean counts in
-    calculation of dfs_data.
     """
     self._data_dir = data_dir
     self._is_normalized_wrtT0 = is_normalized_wrtT0
     self._is_only_qgenes = is_only_qgenes
     self._is_display_errors = is_display_errors
-    self._is_normalize = is_normalize
     self._setValues()
 
   def _setValues(self, provider=None):
@@ -142,7 +150,7 @@ class DataProvider(object):
     return df.set_index(cn.GENE_ID)
 
   def _getNumRepl(self):
-      return len(self.dfs_data)
+      return len(self.dfs_centered_adjusted_read_count)
 
   def _makeMeanDF(self, is_abs=True):
       """
@@ -154,7 +162,7 @@ class DataProvider(object):
         predicate = lambda v: np.abs(v)
       else:
         predicate = lambda v: v
-      dfs_new = [df.applymap(predicate) for df in self.dfs_data]
+      dfs_new = [df.applymap(predicate) for df in self.dfs_centered_adjusted_read_count]
       return sum (dfs_new) / self._getNumRepl()
 
   def _makeStdDF(self):
@@ -164,7 +172,7 @@ class DataProvider(object):
       """
       num_repl = self._getNumRepl()
       df_mean = self._makeMeanDF()
-      df_std = (sum([self.dfs_data[n]*self.dfs_data[n]
+      df_std = (sum([self.dfs_centered_adjusted_read_count[n]*self.dfs_centered_adjusted_read_count[n]
           for n in range(num_repl)])
           - num_repl * df_mean * df_mean) / (num_repl - 1)
       return df_std.pow(1./2)
@@ -177,10 +185,9 @@ class DataProvider(object):
     """
     return pd.DataFrame([r for idx, r in df.iterrows() if idx in self.df_gene_description.index])
 
-  def _makeDataDFS(self, is_normalize=True):
+  def _makeReadCountDFS(self):
     """
     Creates a list of dataframes for each replication of the counts.
-    :param bool is_normalize: normalize the counts
     :return list-pd.DataFrame:
       indexed by GENE_ID
       column names are integers of time indices
@@ -212,13 +219,6 @@ class DataProvider(object):
         df_repl = df[column_names]
         df_repl = df_repl.rename(columns=new_names)
         df_repl.index = df.index
-        # Normalize values as a fraction of total expression as 1000 * fraction
-        if is_normalize:
-          df_repl = self.normalizeReadsDF(df_repl)
-        # Subtract the mean across times
-          df_repl_mean = df_repl.mean(axis=1)
-          for idx in df_repl_mean.index:
-            df_repl.loc[idx, :] = df_repl.loc[idx, :] - df_repl_mean[idx]
         dfs.append(df_repl)
     #
     return dfs
@@ -293,7 +293,7 @@ class DataProvider(object):
 
   def equals(self, provider):
     """
-    Ensures the equality of all top level dataframes (not dfs_data)
+    Ensures the equality of all top level dataframes (not dfs_centered_adjusted_read_count)
     :return bool: True if equal
     """
     for var in self.__class__.instance_variables:
@@ -318,16 +318,49 @@ class DataProvider(object):
     df = df.sort_values(cn.GO_TERM)
     return df
 
+  def _makeAdjustedReadCount(self):
+    """
+    Creates the dataframe of normalized replicas.
+    :return list-pd.DataFrame:
+        each replica is adjusted for library size and gene length
+    """
+    return [self.normalizeReadsDF(df) for df in self.dfs_read_count]
+
   def do(self, data_dir=cn.DATA_DIR):
     """
     Assigns values to the instance data.
     """
+    def _makeCenteredDFS(self):
+      """
+      Centers the dataframe
+      :return list-pd.DataFrame:
+        indexed by GENE_ID
+        column names are integers of time indices
+      """
+      dfs = []
+      # Handle normalization
+      for df in self.dfs_adjusted_read_count:
+        ser_mean = df.mean(axis=1)
+        for idx in ser_mean.index:
+          df.loc[idx, :] = df.loc[idx, :] - ser_mean[idx]
+        dfs.append(df)
+      #
+      return dfs
+    #
+    def center(df):
+      """
+      Centers the dataframe along the rows
+      :param pd.DataFrame:
+      :return pd.DataFrame: same index, column
+      """
+      df_result = df.T
+      df_result = df_result - df_result.mean()
+      return df_result.T
+    #
     persister = Persister(cn.DATA_PROVIDER_PERSISTER_PATH)
     if persister.isExist():
       provider = persister.get()
       self._setValues(provider=provider)
-      if self._is_normalize != provider._is_normalize:
-        self.dfs_data = self._makeDataDFS(self._is_normalize)
     else:
       # Gene categorizations
       self.df_ec_terms =  \
@@ -351,8 +384,13 @@ class DataProvider(object):
       self.df_stage_matrix = self._makeStageMatrixDF()
       # Normalized data values
       self.df_normalized = self._makeNormalizedDF()
-      # Time course data
-      self.dfs_data = self._makeDataDFS(self._is_normalize)
+      # Raw readcounts
+      self.dfs_read_count = self._makeReadCountDFS()
+      # Time course data adjusted for gene length and library size
+      self.dfs_adjusted_read_count = self._makeAdjustedReadCount()
+      # Adjusted and centered data
+      self.dfs_centered_adjusted_read_count =  \
+          [center(df) for df in self.dfs_adjusted_read_count]
       # Hypoxia data
       self.df_hypoxia = self._makeHypoxiaDF()
       # Create mean and std dataframes
