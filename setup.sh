@@ -13,6 +13,5 @@ conda config --set always_yes yes --set changeps1 no
 conda update --quiet conda
 conda info --all
 conda env create --quiet --name ${NAME} --file environment.yml
-conda install jupyter notebook
 echo "**Use conda activate ${NAME} to enter environment"
 echo "  Use conda deactive to leave environment"

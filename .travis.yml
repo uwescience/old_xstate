@@ -11,14 +11,7 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda update --quiet conda
-  - conda info --all
-  - conda env create --quiet --name xstate --file environment.yml
-  - source activate xstate
-  - pip install --upgrade pip
-  - conda install -c anaconda nose requests scipy seaborn
-  - pip install matplotlib numpy pandas nose pyyaml
-  - pip install sklearn scipy seaborn
+  - bash setup.sh
 
 script:
   - PYTHONPATH="`pwd`/xstate/python:`pwd`/common_python"
