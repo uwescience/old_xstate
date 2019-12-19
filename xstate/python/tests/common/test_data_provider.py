@@ -34,7 +34,7 @@ class TestDataProvider(unittest.TestCase):
 
   def makeData(self, size=SIZE):
     df_data = pd.DataFrame({'a': range(10)})
-    self.provider.dfs_centered_adjusted_read_count = [df_data for _ in range(SIZE)]
+    self.provider._dfs_centered_adjusted_read_count = [df_data for _ in range(SIZE)]
 
   def checkDF(self, df, is_check_index=True):
     """
@@ -98,7 +98,7 @@ class TestDataProvider(unittest.TestCase):
     if IGNORE_TEST:
       return
     self.init()
-    self.provider.dfs_centered_adjusted_read_count = range(3)
+    self.provider._dfs_centered_adjusted_read_count = range(3)
     self.assertEqual(self.provider._getNumRepl(), 3)
 
   def testMakeMeanDF(self):
@@ -142,14 +142,17 @@ class TestDataProvider(unittest.TestCase):
     self.init()
     self.provider.do()
     # Specific tests
-    testLessEqual(self.provider.dfs_centered_adjusted_read_count,
-        self.provider.dfs_adjusted_read_count)
+    dfs_adjusted_read_count  \
+        = self.provider.dfs_adjusted_read_count
+    dfs_centered_adjusted_read_count  \
+        = self.provider.dfs_centered_adjusted_read_count
+    testLessEqual(dfs_centered_adjusted_read_count,
+        dfs_adjusted_read_count)
     # Common tests
     self.assertEqual(
-        len(self.provider.dfs_centered_adjusted_read_count),
+        len(dfs_centered_adjusted_read_count),
         data_provider.NUM_REPL)
-    [self.checkDF(df) for df in 
-        self.provider.dfs_centered_adjusted_read_count]
+    [self.checkDF(df) for df in dfs_centered_adjusted_read_count]
     dfs = [
         self.provider.df_gene_description,
         self.provider.df_mean,
@@ -158,9 +161,9 @@ class TestDataProvider(unittest.TestCase):
         self.provider.df_normalized,
         self.provider.df_gene_expression_state,
         ]
-    dfs.extend(self.provider.dfs_centered_adjusted_read_count)
+    dfs.extend(dfs_centered_adjusted_read_count)
     dfs.extend(self.provider.dfs_read_count)
-    dfs.extend(self.provider.dfs_adjusted_read_count)
+    dfs.extend(dfs_adjusted_read_count)
     [self.checkDF(df) for df in dfs]
     dfs = [
         self.provider.df_kegg_gene_pathways, 

@@ -78,9 +78,9 @@ class DataProvider(object):
     "df_ko_terms",
     "df_kegg_pathways",
     "df_kegg_gene_pathways",
-    "dfs_adjusted_read_count",
-    "dfs_centered_adjusted_read_count",
     "dfs_read_count",
+    "_dfs_adjusted_read_count",
+    "_dfs_centered_adjusted_read_count",
     ]
 
   def __init__(self, data_dir=cn.DATA_DIR, is_normalized_wrtT0=True,
@@ -150,7 +150,7 @@ class DataProvider(object):
     return df.set_index(cn.GENE_ID)
 
   def _getNumRepl(self):
-      return len(self.dfs_centered_adjusted_read_count)
+      return NUM_REPL
 
   def _makeMeanDF(self, is_abs=True):
       """
@@ -162,8 +162,9 @@ class DataProvider(object):
         predicate = lambda v: np.abs(v)
       else:
         predicate = lambda v: v
-      dfs_new = [df.applymap(predicate) for df in self.dfs_centered_adjusted_read_count]
-      return sum (dfs_new) / self._getNumRepl()
+      dfs = self.dfs_centered_adjusted_read_count
+      dfs_new = [df.applymap(predicate) for df in dfs]
+      return sum (dfs_new) / len(dfs)
 
   def _makeStdDF(self):
       """
@@ -172,8 +173,8 @@ class DataProvider(object):
       """
       num_repl = self._getNumRepl()
       df_mean = self._makeMeanDF()
-      df_std = (sum([self.dfs_centered_adjusted_read_count[n]*self.dfs_centered_adjusted_read_count[n]
-          for n in range(num_repl)])
+      dfs = self.dfs_centered_adjusted_read_count
+      df_std = (sum([dfs[n]*dfs[n] for n in range(num_repl)])
           - num_repl * df_mean * df_mean) / (num_repl - 1)
       return df_std.pow(1./2)
 
@@ -293,7 +294,7 @@ class DataProvider(object):
 
   def equals(self, provider):
     """
-    Ensures the equality of all top level dataframes (not dfs_centered_adjusted_read_count)
+    Ensures the equality of all top level dataframes except dfs_*
     :return bool: True if equal
     """
     for var in self.__class__.instance_variables:
@@ -318,35 +319,20 @@ class DataProvider(object):
     df = df.sort_values(cn.GO_TERM)
     return df
 
-  def _makeAdjustedReadCount(self):
+  @property
+  def dfs_adjusted_read_count(self):
     """
     Creates the dataframe of normalized replicas.
     :return list-pd.DataFrame:
         each replica is adjusted for library size and gene length
     """
-    return [self.normalizeReadsDF(df) for df in self.dfs_read_count]
+    if self._dfs_adjusted_read_count is None:
+      self._dfs_adjusted_read_count =   \
+          [self.normalizeReadsDF(df) for df in self.dfs_read_count]
+    return self._dfs_adjusted_read_count
 
-  def do(self, data_dir=cn.DATA_DIR):
-    """
-    Assigns values to the instance data.
-    """
-    def _makeCenteredDFS(self):
-      """
-      Centers the dataframe
-      :return list-pd.DataFrame:
-        indexed by GENE_ID
-        column names are integers of time indices
-      """
-      dfs = []
-      # Handle normalization
-      for df in self.dfs_adjusted_read_count:
-        ser_mean = df.mean(axis=1)
-        for idx in ser_mean.index:
-          df.loc[idx, :] = df.loc[idx, :] - ser_mean[idx]
-        dfs.append(df)
-      #
-      return dfs
-    #
+  @property
+  def dfs_centered_adjusted_read_count(self):
     def center(df):
       """
       Centers the dataframe along the rows
@@ -357,6 +343,15 @@ class DataProvider(object):
       df_result = df_result - df_result.mean()
       return df_result.T
     #
+    if self._dfs_centered_adjusted_read_count is None:
+      self._dfs_centered_adjusted_read_count =  \
+          [center(df) for df in self.dfs_adjusted_read_count]
+    return self._dfs_centered_adjusted_read_count
+
+  def do(self, data_dir=cn.DATA_DIR):
+    """
+    Assigns values to the instance data.
+    """
     persister = Persister(cn.DATA_PROVIDER_PERSISTER_PATH)
     if persister.isExist():
       provider = persister.get()
@@ -386,11 +381,6 @@ class DataProvider(object):
       self.df_normalized = self._makeNormalizedDF()
       # Raw readcounts
       self.dfs_read_count = self._makeReadCountDFS()
-      # Time course data adjusted for gene length and library size
-      self.dfs_adjusted_read_count = self._makeAdjustedReadCount()
-      # Adjusted and centered data
-      self.dfs_centered_adjusted_read_count =  \
-          [center(df) for df in self.dfs_adjusted_read_count]
       # Hypoxia data
       self.df_hypoxia = self._makeHypoxiaDF()
       # Create mean and std dataframes
