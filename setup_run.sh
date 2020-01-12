@@ -4,7 +4,7 @@
 for d in common_python
   do
     cd $d
-    source setup_env.sh
+    source setup_run.sh
     cd ..
   done
 #

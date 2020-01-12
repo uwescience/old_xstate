@@ -144,6 +144,8 @@ class TestDataProvider(unittest.TestCase):
     # Specific tests
     dfs_adjusted_read_count  \
         = self.provider.dfs_adjusted_read_count
+    dfs_adjusted_read_count_wrt0  \
+        = self.provider.dfs_adjusted_read_count_wrt0
     dfs_centered_adjusted_read_count  \
         = self.provider.dfs_centered_adjusted_read_count
     testLessEqual(dfs_centered_adjusted_read_count,
@@ -164,6 +166,7 @@ class TestDataProvider(unittest.TestCase):
     dfs.extend(dfs_centered_adjusted_read_count)
     dfs.extend(self.provider.dfs_read_count)
     dfs.extend(dfs_adjusted_read_count)
+    dfs.extend(dfs_adjusted_read_count_wrt0)
     [self.checkDF(df) for df in dfs]
     dfs = [
         self.provider.df_kegg_gene_pathways, 
@@ -199,6 +202,7 @@ class TestDataProvider(unittest.TestCase):
         df.columns))
     self.assertEqual(len(df), len(df_normalized))
     ser_length = provider.df_gene_description[cn.LENGTH]
+  
 
 
 if __name__ == '__main__':

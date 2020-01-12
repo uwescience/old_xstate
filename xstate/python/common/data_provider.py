@@ -30,6 +30,9 @@ Makes Data Available in Standard Formats. Creates the following data:
   dfs_adjusted_read_count - readcounts adjusted w.r.t. library size, gene length
      index: cn.GENE_ID
      column: time
+  dfs_adjusted_read_count_wrt0 - adjusted w.r.t. libary size, gene length, time 0
+     index: cn.GENE_ID
+     column: time
   dfs_centered_adjusted_read_count - centers w.r.t. mean value of gene
      index: cn.GENE_ID
      column: time
@@ -57,6 +60,7 @@ FILENAME_KEGG_PATHWAYS = "mtb_kegg_pathways"
 FILENAME_KEGG_GENE_PATHWAY = "mtb_kegg_gene_pathway"
 NUM_REPL = 3
 TIME_0 = "T0"
+T0 = 0
 MIN_LOG2_VALUE = -10
 MIN_VALUE = 10e-5
 MILLION = 1e6
@@ -80,6 +84,7 @@ class DataProvider(object):
     "df_kegg_gene_pathways",
     "dfs_read_count",
     "_dfs_adjusted_read_count",
+    "_dfs_adjusted_read_count_wrt0",
     "_dfs_centered_adjusted_read_count",
     ]
 
@@ -322,14 +327,36 @@ class DataProvider(object):
   @property
   def dfs_adjusted_read_count(self):
     """
-    Creates the dataframe of normalized replicas.
+    Creates the dataframe replicats adjusted for
+    library size and gene length.
     :return list-pd.DataFrame:
-        each replica is adjusted for library size and gene length
+        columns are times
     """
     if self._dfs_adjusted_read_count is None:
       self._dfs_adjusted_read_count =   \
           [self.normalizeReadsDF(df) for df in self.dfs_read_count]
     return self._dfs_adjusted_read_count
+
+  @property
+  def dfs_adjusted_read_count_wrt0(self):
+    """
+    Creates the dataframe replicats adjusted for
+    library size and gene length normalized w.r.t. time 0.
+    :return list-pd.DataFrame:
+        columns are times
+    """
+    if self._dfs_adjusted_read_count_wrt0 is None:
+      dfs = []
+      for df in self.dfs_adjusted_read_count:
+        sers = []
+        for column in df.columns:
+          sers.append(df[column] / df[T0])
+        df_adj = pd.DataFrame(sers)
+        df_adj.index = df.columns
+        dfs.append(df_adj.T)
+      self._dfs_adjusted_read_count_wrt0 = dfs
+      #self._dfs_adjusted_read_count_wrt0 = [ df/df[T0] for df in self.dfs_adjusted_read_count]
+    return self._dfs_adjusted_read_count_wrt0
 
   @property
   def dfs_centered_adjusted_read_count(self):
